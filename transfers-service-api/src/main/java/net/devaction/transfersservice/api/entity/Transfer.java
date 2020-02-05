@@ -21,7 +21,7 @@ public class Transfer {
     private long timestamp;
 
     @ConstructorProperties({"source_account_id", "target_account_id", "amount", "currency", "timestamp"})
-    public Transfer(String sourceAccountId, String targetAccountId, long amount, String currency, long timestamp){
+    public Transfer(String sourceAccountId, String targetAccountId, long amount, String currency, long timestamp) {
         this.sourceAccountId = sourceAccountId;
         this.targetAccountId = targetAccountId;
         this.amount = amount;

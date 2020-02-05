@@ -10,17 +10,17 @@ import spark.Spark;
  *
  * since February 2020
  */
-public class PostExample{
+public class PostExample {
     private static final Logger log = LoggerFactory.getLogger(PostExample.class);
 
     public static void main(String[] args) {
-    Spark.post("/users", (request, response) -> {
-        response.type("application/json");
-        // User user = new Gson().fromJson(request.body(), User.class);
-        // userService.addUser(user);
-        String requestBody = request.body();
-        // return new Gson().toJson(new StandardResponse(StatusResponse.SUCCESS));
-        return "";
-    });
-   }
+        Spark.post("/users", (request, response) -> {
+            response.type("application/json");
+            // User user = new Gson().fromJson(request.body(), User.class);
+            // userService.addUser(user);
+            String requestBody = request.body();
+            // return new Gson().toJson(new StandardResponse(StatusResponse.SUCCESS));
+            return "";
+        });
+    }
 }
