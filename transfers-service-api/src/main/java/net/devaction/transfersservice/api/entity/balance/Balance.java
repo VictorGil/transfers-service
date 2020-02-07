@@ -1,4 +1,4 @@
-package net.devaction.transfersservice.api.entity;
+package net.devaction.transfersservice.api.entity.balance;
 
 import java.beans.ConstructorProperties;
 
@@ -11,18 +11,16 @@ public class Balance {
 
     private final String accountId;
     private final long amount;
-    private final long version;
 
-    @ConstructorProperties({"account_id", "amount", "version"})
-    public Balance(String accountId, long amount, long version) {
+    @ConstructorProperties({"account_id", "amount"})
+    public Balance(String accountId, long amount) {
         this.accountId = accountId;
         this.amount = amount;
-        this.version = version;
     }
 
     @Override
     public String toString() {
-        return "Balance [accountId=" + accountId + ", amount=" + amount + ", version=" + version + "]";
+        return "Balance [accountId=" + accountId + ", amount=" + amount + "]";
     }
 
     public String getAccountId() {
@@ -31,9 +29,5 @@ public class Balance {
 
     public long getAmount() {
         return amount;
-    }
-
-    public long getVersion() {
-        return version;
     }
 }

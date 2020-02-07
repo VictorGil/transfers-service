@@ -1,7 +1,8 @@
-package net.devaction.transfersservice.api.entity;
+package net.devaction.transfersservice.api.entity.balance;
 
 import org.junit.jupiter.api.Test;
 
+import net.devaction.transfersservice.api.entity.balance.Balance;
 import net.devaction.transfersservice.api.util.json.FileReader;
 import net.devaction.transfersservice.api.util.json.JsonUnmarshaller;
 
@@ -24,6 +25,5 @@ public class BalanceDeserializationTest {
 
         assertThat(balance.getAccountId()).isEqualTo("test_account_01");
         assertThat(balance.getAmount()).isEqualTo(300);
-        assertThat(balance.getVersion()).isEqualTo(1);
     }
 }
