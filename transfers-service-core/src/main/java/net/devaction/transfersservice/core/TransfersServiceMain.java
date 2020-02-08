@@ -6,11 +6,14 @@ import org.slf4j.LoggerFactory;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;
 
+import net.devaction.transfersservice.api.entity.balance.Balance;
 import net.devaction.transfersservice.api.entity.transfer.Transfer;
 import net.devaction.transfersservice.api.util.json.JsonUnmarshaller;
 import net.devaction.transfersservice.core.manager.AccountManager;
 import net.devaction.transfersservice.core.response.Response;
-import net.devaction.transfersservice.core.response.Status;
+
+import static net.devaction.transfersservice.core.response.Status.SUCCESS;
+import static net.devaction.transfersservice.core.response.Status.ERROR;
 
 import spark.Spark;
 
@@ -36,7 +39,7 @@ public class TransfersServiceMain {
     private void run() {
         log.info("Starting the Transfers service");
 
-        Spark.post(TRANSFERS + "/new", (sparkRequest, sparkResponse) -> {
+        Spark.post(TRANSFERS + "/new-transfer", (sparkRequest, sparkResponse) -> {
             sparkResponse.type(APPLICATION_JSON);
             String requestBody = sparkRequest.body();
             log.trace("Request to process a new \"Transfer\" has been received:\n{}", requestBody);
@@ -47,11 +50,28 @@ public class TransfersServiceMain {
                 transfer = transferUnmarshaller.unmarshall(requestBody);
                 accountManager.processTransfer(transfer);
             } catch (Exception ex) {
-                response = new Response(Status.ERROR, ex.toString());
+                response = new Response(ERROR, ex.toString());
                 return responseWriter.writeValueAsString(response);
             }
 
             return responseWriter.writeValueAsString(new Response());
+        });
+
+        Spark.post(TRANSFERS + "/new-account", (sparkRequest, sparkResponse) -> {
+            sparkResponse.type(APPLICATION_JSON);
+
+            Response response = null;
+            String accountId = null;
+            String currency = sparkRequest.queryParams("currency");
+            try {
+                accountId = accountManager.openNewAccount(currency);
+            } catch (Exception ex) {
+                response = new Response(ERROR, ex.toString());
+                return responseWriter.writeValueAsString(response);
+            }
+
+            Balance accountBalance = new Balance(accountId);
+            return responseWriter.writeValueAsString(new Response(SUCCESS, accountBalance));
         });
     }
 }

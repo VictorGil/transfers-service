@@ -20,6 +20,11 @@ public class Balance implements ResponseData {
         this.amount = amount;
     }
 
+    public Balance(String accountId) {
+        this.accountId = accountId;
+        this.amount = 0L;
+    }
+
     @Override
     public String toString() {
         return "Balance [accountId=" + accountId + ", amount=" + amount + "]";

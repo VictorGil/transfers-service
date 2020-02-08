@@ -46,10 +46,10 @@ public class Transfer {
         this.targetAccountId = targetAccountId;
         this.amount = amount;
         this.currency = currency;
+
         timestamp = Instant.now().toEpochMilli();
         id = generateRandomId();
     }
-
 
     private String generateRandomId() {
         // last 12 hexadecimal digits of the random UUID

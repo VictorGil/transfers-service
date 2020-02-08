@@ -36,6 +36,18 @@ public class Response {
         data = EMPTY_JSON_NODE;
     }
 
+    public Response(Status status, ResponseData responseData) {
+        this.status = status;
+        this.errorMessage = "N/A";
+        data = MAPPER.valueToTree(responseData);
+    }
+
+    public Response(ResponseData responseData) {
+        this.status = Status.SUCCESS;
+        this.errorMessage = "N/A";
+        data = MAPPER.valueToTree(responseData);
+    }
+
     public Response() {
         this.status = Status.SUCCESS;
         this.errorMessage = "N/A";

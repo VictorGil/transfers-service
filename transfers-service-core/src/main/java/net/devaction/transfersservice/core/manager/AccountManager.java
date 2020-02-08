@@ -19,27 +19,42 @@ import net.devaction.transfersservice.core.account.UnableToObtainMutexException;
 public class AccountManager {
     private static final Logger log = LoggerFactory.getLogger(AccountManager.class);
 
-    private Map<String, Account> accountMap = new ConcurrentHashMap<>();
+    private final TransferChecker transferChecker = new TransferChecker();
 
-    public String openNewAccount(String currency) {
+    private final Map<String, Account> accountMap = new ConcurrentHashMap<>();
+
+    public String openNewAccount(String currency) throws InvalidCurrencyException {
+        log.trace("Going to open a new account, currency: {}", currency);
+        transferChecker.checkCurrency(currency);
+
         Account account = new Account(currency);
         accountMap.put(account.getId(), account);
-        return account.getId();
+
+        String accountId = account.getId();
+        log.trace("New account has been created, account id: {}", accountId);
+        return accountId;
     }
 
-    public void closeAccount(String accountId) throws AccountDoesNotExistException {
+    public void closeAccount(String accountId) throws AccountDoesNotExistException, InvalidAccountIdException {
+        log.trace("Going to close the account with id: \"{}\"", accountId);
+        transferChecker.checkAccountId(accountId);
+
         if (!accountMap.containsKey(accountId)) {
             String errorMessage = "Failed to close account, account with id \"" + accountId + "\" does not exist";
             log.error(errorMessage);
             throw new AccountDoesNotExistException(errorMessage);
         }
         accountMap.remove(accountId);
+
+        log.trace("Account with id \"{}\" has been closed", accountId);
     }
 
     public void processTransfer(Transfer transfer) throws AccountDoesNotExistException,
-                UnableToObtainMutexException, NotEnoughBalanceException {
+                UnableToObtainMutexException, NotEnoughBalanceException, InvalidAccountIdException,
+                InvalidCurrencyException, InvalidAmountException, InvalidTimestampException {
 
-        log.trace("New \"Transfer\" object to be processed:\n{}", transfer);
+        log.debug("New \"Transfer\" object to be processed:\n{}", transfer);
+        transferChecker.checkTransfer(transfer);
 
         Account sourceAccount = accountMap.get(transfer.getSourceAccountId());
         if (sourceAccount == null) {
