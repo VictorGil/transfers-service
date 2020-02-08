@@ -22,7 +22,7 @@ public class JsonUnmarshaller<T> {
         objectReader = new ObjectMapper().readerFor(clazz);
     }
 
-    public T unmarshall(String jsonString) throws Exception {
+    public T unmarshall(String jsonString) throws IOException {
         T object = null;
         try {
             object = objectReader.readValue(jsonString);

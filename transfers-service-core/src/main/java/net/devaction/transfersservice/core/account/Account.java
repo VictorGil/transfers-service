@@ -4,6 +4,7 @@ import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Random;
+import java.util.UUID;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
@@ -34,12 +35,16 @@ public class Account {
     private BlockingQueue<Object> mutexQueue = new LinkedBlockingQueue<>(1);
     private final Random randomGenerator = new Random();
 
-    public Account(String id, String currency) {
-        this.id = id;
+    public Account(String currency) {
+        if (currency == null) {
+            throw new IllegalArgumentException("Currency must not be null");
+        }
+
+        this.id = generateRandomId();
         this.currency = currency;
     }
 
-    public void add(Transfer transfer) {
+    public void add(Transfer transfer) throws NotEnoughBalanceException {
         // This should never happen because we should have checked before
         if (!transfer.getCurrency().equals(currency)) {
             String errorMessage = "The transfer currency does not match this "
@@ -57,23 +62,9 @@ public class Account {
         history.add(historyItem);
     }
 
-    long updateBalance(long balance, long amount, Direction direction) {
-
-        long updatedBalance;
-        if (direction == RECEIVED) {
-            updatedBalance = balance + amount;
-        } else {
-            updatedBalance = balance - amount;
-        }
-
-        // This should never happen because we should have checked before
-        if (updatedBalance < 0) {
-            String errorMessage = "The account balance cannot be lower than 0";
-            log.error(errorMessage);
-            throw new IllegalArgumentException(errorMessage);
-        }
-
-        return updatedBalance;
+    private String generateRandomId() {
+        // last 12 hexadecimal digits of the random UUID
+        return UUID.randomUUID().toString().substring(24);
     }
 
     AccountHistoryItem createHistoryItem(Transfer transfer) {
@@ -82,6 +73,23 @@ public class Account {
 
         return new AccountHistoryItem(transfer.getId(),
                 counterpartyId, transfer.getAmount(), direction, transfer.getTimestamp());
+    }
+
+    long updateBalance(long balance, long amount, Direction direction) throws NotEnoughBalanceException {
+
+        long updatedBalance;
+        if (direction == RECEIVED) {
+            updatedBalance = balance + amount;
+        } else {
+            updatedBalance = balance - amount;
+            if (updatedBalance < 0) {
+                String errorMessage = "Not enough balance in account";
+                log.error(errorMessage);
+                throw new NotEnoughBalanceException(errorMessage);
+            }
+        }
+
+        return updatedBalance;
     }
 
     String extractCounterpartyId(Transfer transfer) {
@@ -157,7 +165,53 @@ public class Account {
         return mutex;
     }
 
+    public void returnMutex(Object mutex) {
+        if (!mutexQueue.offer(mutex)) {
+            log.error("Unable to return the mutex to the queue");;
+        }
+    }
+
     long getRandomMillis() {
-        return randomGenerator.nextInt(51) + 50; // from 50 to 100 inclusive
+        return randomGenerator.nextInt(51) + 50L; // from 50 to 100 inclusive
+    }
+
+    @Override
+    public int hashCode() {
+        final int prime = 31;
+        int result = 1;
+
+        result = prime * result + ((id == null) ? 0 : id.hashCode());
+        result = prime * result + ((currency == null) ? 0 : currency.hashCode());
+
+        return result;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+
+        if (obj == null) {
+            return false;
+        }
+
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+
+        Account other = (Account) obj;
+        // We know there is no way an id can be null
+        if (!id.equals(other.id)) {
+            return false;
+        }
+
+        // We know there is no way a currency can be null
+        if (!currency.equals(other.currency)) {
+            log.warn("We have detected two different Account objects with the same id");
+            return false;
+        }
+
+        return true;
     }
 }

@@ -2,12 +2,14 @@ package net.devaction.transfersservice.api.entity.account;
 
 import java.util.List;
 
+import net.devaction.transfersservice.api.entity.ResponseData;
+
 /**
  * @author Víctor Gil
  *
  * since February 2020
  */
-public class AccountInfo {
+public class AccountInfo implements ResponseData {
     private final String accountId;
     private final String currency;
     private final long balance;

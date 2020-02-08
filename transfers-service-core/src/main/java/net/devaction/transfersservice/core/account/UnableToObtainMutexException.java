@@ -6,8 +6,10 @@ package net.devaction.transfersservice.core.account;
  * since February 2020
  */
 public class UnableToObtainMutexException extends Exception {
- 
-    public UnableToObtainMutexException(String errorMessage) {
+
+    private static final long serialVersionUID = -1584628854777887663L;
+
+    UnableToObtainMutexException(String errorMessage) {
         super(errorMessage);
     }
 }

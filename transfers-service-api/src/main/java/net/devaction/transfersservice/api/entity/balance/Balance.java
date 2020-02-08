@@ -2,12 +2,14 @@ package net.devaction.transfersservice.api.entity.balance;
 
 import java.beans.ConstructorProperties;
 
+import net.devaction.transfersservice.api.entity.ResponseData;
+
 /**
  * @author Víctor Gil
  *
  * since February 2020
  */
-public class Balance {
+public class Balance implements ResponseData {
 
     private final String accountId;
     private final long amount;
