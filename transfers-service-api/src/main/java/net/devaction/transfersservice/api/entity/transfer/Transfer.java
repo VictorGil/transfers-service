@@ -1,6 +1,11 @@
 package net.devaction.transfersservice.api.entity.transfer;
 
 import java.beans.ConstructorProperties;
+import java.time.Instant;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.Locale;
 import java.util.UUID;
 
 import org.slf4j.Logger;
@@ -14,8 +19,11 @@ import org.slf4j.LoggerFactory;
 public class Transfer {
     private static final Logger log = LoggerFactory.getLogger(Transfer.class);
 
+    private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern(
+            "EEEE dd-MMM-yyyy HH:mm:ss.SSSZ", new Locale("en"));
+
     private static final String SAME_ID_ERROR_MESSAGE =
-            "Two different entities have same id value:\\n{}\\nvs\\n{}";
+            "Two different entities have same id value:\n{}\nvs\n{}";
 
     // This is an automatically (internally) generated
     // random id
@@ -32,14 +40,14 @@ public class Transfer {
     // Milliseconds from UNIX epoch
     private long timestamp;
 
-    @ConstructorProperties({"source_account_id", "target_account_id", "amount", "currency", "timestamp"})
-    public Transfer(String sourceAccountId, String targetAccountId, long amount, String currency, long timestamp) {
+    @ConstructorProperties({"source_account_id", "target_account_id", "amount", "currency"})
+    public Transfer(String sourceAccountId, String targetAccountId, long amount, String currency) {
         this.sourceAccountId = sourceAccountId;
         this.targetAccountId = targetAccountId;
         this.amount = amount;
         this.currency = currency;
-        this.timestamp = timestamp;
-        this.id = generateRandomId();
+        timestamp = Instant.now().toEpochMilli();
+        id = generateRandomId();
     }
 
 
@@ -48,10 +56,18 @@ public class Transfer {
         return UUID.randomUUID().toString().substring(24);
     }
 
+    private String getTimestampString(long epochMilli) {
+
+        ZonedDateTime dateTime = Instant.ofEpochMilli(epochMilli)
+                .atZone(ZoneId.systemDefault());
+
+        return epochMilli + " (" + FORMATTER.format(dateTime) + ")";
+    }
+
     @Override
     public String toString() {
         return "Transfer [id: " + id + ", sourceAccountId: " + sourceAccountId + ", targetAccountId: " + targetAccountId
-                + ", amount (in cents): " + amount + ", currency: " + currency + ", timestamp: " + timestamp + "]";
+                + ", amount (in cents): " + amount + ", currency: " + currency + ", timestamp: " + getTimestampString(timestamp) + "]";
     }
 
     @Override

@@ -39,6 +39,7 @@ public class TransfersServiceMain {
         Spark.post(TRANSFERS + "/new", (sparkRequest, sparkResponse) -> {
             sparkResponse.type(APPLICATION_JSON);
             String requestBody = sparkRequest.body();
+            log.trace("Request to process a new \"Transfer\" has been received:\n{}", requestBody);
 
             Transfer transfer = null;
             Response response = null;

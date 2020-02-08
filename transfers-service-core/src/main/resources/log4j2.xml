@@ -13,6 +13,8 @@
         <Root level="debug">
             <AppenderRef ref="console" />
         </Root>
+
         <Logger name="net.devaction" level="trace" />
+        <Logger name="org.eclipse.jetty" level="info" />
     </Loggers>
 </Configuration>

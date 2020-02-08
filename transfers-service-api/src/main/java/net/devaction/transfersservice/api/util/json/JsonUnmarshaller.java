@@ -33,7 +33,7 @@ public class JsonUnmarshaller<T> {
             throw new IOException(errorMessage, ex);
         }
 
-        log.trace("Unmarshalled/deserialized object from JSON String: {}", object);
+        log.trace("Unmarshalled/deserialized object from JSON String:\n{}", object);
         return object;
     }
 }

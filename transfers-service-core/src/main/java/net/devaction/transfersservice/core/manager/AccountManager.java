@@ -27,27 +27,40 @@ public class AccountManager {
         return account.getId();
     }
 
+    public void closeAccount(String accountId) throws AccountDoesNotExistException {
+        if (!accountMap.containsKey(accountId)) {
+            String errorMessage = "Failed to close account, account with id \"" + accountId + "\" does not exist";
+            log.error(errorMessage);
+            throw new AccountDoesNotExistException(errorMessage);
+        }
+        accountMap.remove(accountId);
+    }
+
     public void processTransfer(Transfer transfer) throws AccountDoesNotExistException,
                 UnableToObtainMutexException, NotEnoughBalanceException {
 
+        log.trace("New \"Transfer\" object to be processed:\n{}", transfer);
+
         Account sourceAccount = accountMap.get(transfer.getSourceAccountId());
         if (sourceAccount == null) {
-            String errorMessage = "Account with id " + transfer.getSourceAccountId() + " does not exist";
+            String errorMessage = "Failed to process transfer, account with id " + transfer.getSourceAccountId() + " does not exist";
             log.error(errorMessage);
             throw new AccountDoesNotExistException(errorMessage);
         }
 
         Account targetAccount = accountMap.get(transfer.getTargetAccountId());
         if (targetAccount == null) {
-            String errorMessage = "Account with id " + transfer.getTargetAccountId() + " does not exist";
+            String errorMessage = "Failed to process transfer, account with id " + transfer.getTargetAccountId() + " does not exist";
             log.error(errorMessage);
             throw new AccountDoesNotExistException(errorMessage);
         }
 
         // First we need to grab both mutexes, one for each of the accounts involved
+        log.trace("Going to try to grab the mutex for the source account");
         Object sourceAccountMutex = sourceAccount.getMutex();
         Object targetAccountMutex = null;
 
+        log.trace("Going to try to grab the mutex for the target account");
         try {
             targetAccount.getMutex();
         } catch (UnableToObtainMutexException ex) {
