@@ -19,14 +19,14 @@ import net.devaction.transfersservice.core.manager.transfer.TransferChecker;
  *
  * since February 2020
  */
-public class AccountManager {
-    private static final Logger log = LoggerFactory.getLogger(AccountManager.class);
+public class AccountsManager {
+    private static final Logger log = LoggerFactory.getLogger(AccountsManager.class);
 
     private final TransferChecker transferChecker = new TransferChecker();
 
     private final Map<String, Account> accountMap = new ConcurrentHashMap<>();
 
-    public AccountManager(TransferChecker transferChecker, Map<String, Account> accountMap) {
+    public AccountsManager(TransferChecker transferChecker, Map<String, Account> accountMap) {
         
     }
 
