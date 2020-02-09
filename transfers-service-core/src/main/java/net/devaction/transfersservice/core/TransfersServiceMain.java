@@ -12,7 +12,7 @@ import net.devaction.transfersservice.api.util.json.JsonUnmarshaller;
 import net.devaction.transfersservice.core.accountsmanager.AccountsManager;
 import net.devaction.transfersservice.core.response.Response;
 import net.devaction.transfersservice.core.transfersmanager.TransfersManager;
-import net.devaction.transfersservice.core.transfersmanager.TransferManagerImpl;
+import net.devaction.transfersservice.core.transfersmanager.TransfersManagerImpl;
 
 import static net.devaction.transfersservice.core.response.Status.SUCCESS;
 import static net.devaction.transfersservice.core.response.Status.ERROR;
@@ -31,7 +31,7 @@ public class TransfersServiceMain {
     private static final String APPLICATION_JSON = "application/json";
 
     private final AccountsManager accountManager = new AccountsManager(null, null);
-    private final TransfersManager transferManager = new TransferManagerImpl();
+    private final TransfersManager transferManager = new TransfersManagerImpl();
 
     private final JsonUnmarshaller<Transfer> transferUnmarshaller = new JsonUnmarshaller<>(Transfer.class);
     private final ObjectWriter responseWriter = new ObjectMapper().writerFor(Response.class);
