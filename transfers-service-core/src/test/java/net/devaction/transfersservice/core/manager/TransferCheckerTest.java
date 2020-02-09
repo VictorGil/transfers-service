@@ -2,6 +2,14 @@ package net.devaction.transfersservice.core.manager;
 
 import org.junit.jupiter.api.Test;
 
+import net.devaction.transfersservice.core.transfersmanager.InvalidAccountIdException;
+import net.devaction.transfersservice.core.transfersmanager.InvalidAmountException;
+import net.devaction.transfersservice.core.transfersmanager.InvalidCurrencyException;
+import net.devaction.transfersservice.core.transfersmanager.InvalidTimestampException;
+import net.devaction.transfersservice.core.transfersmanager.InvalidTransferIdException;
+import net.devaction.transfersservice.core.transfersmanager.TransferChecker;
+import net.devaction.transfersservice.core.transfersmanager.TransferCheckerImpl;
+
 // import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.fail;
 
@@ -13,7 +21,7 @@ import java.time.Instant;
  * since February 2020
  */
 class TransferCheckerTest {
-    private final TransferChecker checker = new TransferChecker();
+    private final TransferChecker checker = new TransferCheckerImpl();
 
     @Test
     public void testCheckAmount_01() {

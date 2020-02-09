@@ -16,6 +16,7 @@
 
     <properties>
         <spark.version>2.9.1</spark.version>
+        <guice.version>4.2.2</guice.version>
     </properties>
 
     <dependencies>
@@ -38,6 +39,11 @@
             <groupId>com.sparkjava</groupId>
             <artifactId>spark-core</artifactId>
             <version>${spark.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.google.inject</groupId>
+            <artifactId>guice</artifactId>
+            <version>${guice.version}</version>
         </dependency>
         <dependency>
             <groupId>org.slf4j</groupId>

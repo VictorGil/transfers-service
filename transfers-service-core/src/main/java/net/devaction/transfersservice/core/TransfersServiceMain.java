@@ -12,12 +12,15 @@ import net.devaction.transfersservice.api.util.json.JsonUnmarshaller;
 import net.devaction.transfersservice.core.accountsmanager.AccountsManager;
 import net.devaction.transfersservice.core.response.Response;
 import net.devaction.transfersservice.core.transfersmanager.TransfersManager;
-import net.devaction.transfersservice.core.transfersmanager.TransfersManagerImpl;
 
 import static net.devaction.transfersservice.core.response.Status.SUCCESS;
 import static net.devaction.transfersservice.core.response.Status.ERROR;
 
 import spark.Spark;
+
+import com.google.inject.Guice;
+import com.google.inject.Inject;
+import com.google.inject.Injector;
 
 /**
  * @author Víctor Gil
@@ -30,14 +33,22 @@ public class TransfersServiceMain {
     private static final String TRANSFERS = "/transfers";
     private static final String APPLICATION_JSON = "application/json";
 
-    private final AccountsManager accountManager = new AccountsManager(null, null);
-    private final TransfersManager transferManager = new TransfersManagerImpl();
+    private final AccountsManager accountsManager;
+    private final TransfersManager transfersManager;
 
     private final JsonUnmarshaller<Transfer> transferUnmarshaller = new JsonUnmarshaller<>(Transfer.class);
     private final ObjectWriter responseWriter = new ObjectMapper().writerFor(Response.class);
 
+    @Inject
+    public TransfersServiceMain(AccountsManager accountsManager, TransfersManager transfersManager) {
+        this.accountsManager = accountsManager;
+        this.transfersManager = transfersManager;
+    }
+
     public static void main(String[] args) {
-        new TransfersServiceMain().run();
+        Injector injector = Guice.createInjector(new GuiceModule());
+        TransfersServiceMain main = injector.getInstance(TransfersServiceMain.class);
+        main.run();
     }
 
     private void run() {
@@ -52,7 +63,7 @@ public class TransfersServiceMain {
             Response response = null;
             try {
                 transfer = transferUnmarshaller.unmarshall(requestBody);
-                transferManager.processTransfer(transfer);
+                transfersManager.processTransfer(transfer);
             } catch (Exception ex) {
                 response = new Response(ERROR, ex.toString());
                 return responseWriter.writeValueAsString(response);
@@ -68,7 +79,7 @@ public class TransfersServiceMain {
             String accountId = null;
             String currency = sparkRequest.queryParams("currency");
             try {
-                accountId = accountManager.openNewAccount(currency);
+                accountId = accountsManager.openNewAccount(currency);
             } catch (Exception ex) {
                 response = new Response(ERROR, ex.toString());
                 return responseWriter.writeValueAsString(response);
@@ -119,7 +130,7 @@ public class TransfersServiceMain {
             String accountId = sparkRequest.queryParams("accountId");
             try {
                 // TODO
-                accountManager.closeAccount(accountId);
+                accountsManager.closeAccount(accountId);
             } catch (Exception ex) {
                 response = new Response(ERROR, ex.toString());
                 return responseWriter.writeValueAsString(response);

@@ -1,10 +1,11 @@
 package net.devaction.transfersservice.core.transfersmanager;
 
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.google.inject.Inject;
 
 import net.devaction.transfersservice.api.entity.transfer.Transfer;
 import net.devaction.transfersservice.core.account.Account;
@@ -21,9 +22,16 @@ import net.devaction.transfersservice.core.accountsmanager.AccountDoesNotExistEx
 public class TransfersManagerImpl implements TransfersManager {
     private static final Logger log = LoggerFactory.getLogger(TransfersManagerImpl.class);
 
-    private final TransferChecker transferChecker = new TransferChecker();
+    private final Map<String, Account> accountMap;
+    private final TransferChecker transferChecker;
 
-    private final Map<String, Account> accountMap = new ConcurrentHashMap<>();
+    @Inject
+    public TransfersManagerImpl(Map<String, Account> accountMap,
+            TransferChecker transferChecker) {
+
+        this.accountMap = accountMap;
+        this.transferChecker = transferChecker;
+    }
 
     @Override
     public void processTransfer(Transfer transfer)

@@ -43,6 +43,8 @@ public class Account {
 
         this.id = generateRandomId();
         this.currency = currency;
+
+        mutexQueue.add(new Object());
     }
 
     public void add(Transfer transfer) throws NotEnoughBalanceException, AmountTooBigException, InvalidCurrencyException {
@@ -151,9 +153,14 @@ public class Account {
         int count = 1;
 
         try {
-            while (count <= maxNumberOfAttempts && mutex == null) {
+            while (count <= maxNumberOfAttempts) {
                 mutex = mutexQueue.poll(getRandomMillis(), TimeUnit.MILLISECONDS);
-                log.warn("Unable to obtain mutex, attempt number: {}", count);
+                if (mutex == null) {
+                    log.warn("Unable to obtain mutex, attempt number: {}", count);
+                    count++;
+                } else {
+                    return mutex;
+                }
             }
         } catch (InterruptedException ex) {
             Thread.currentThread().interrupt();
@@ -162,18 +169,14 @@ public class Account {
             throw new UnableToObtainMutexException(errorMessage);
         }
 
-        if (mutex == null) {
-            String errorMessage = "Unable to obtain mutex after " + maxNumberOfAttempts + " attempts";
-            log.error(errorMessage);
-            throw new UnableToObtainMutexException(errorMessage);
-        }
-
-        return mutex;
+        String errorMessage = "Unable to obtain mutex after " + maxNumberOfAttempts + " attempts";
+        log.error(errorMessage);
+        throw new UnableToObtainMutexException(errorMessage);
     }
 
     public void returnMutex(Object mutex) {
         if (!mutexQueue.offer(mutex)) {
-            log.error("Unable to return the mutex to the queue");;
+            log.error("Unable to return the mutex to the queue");
         }
     }
 
