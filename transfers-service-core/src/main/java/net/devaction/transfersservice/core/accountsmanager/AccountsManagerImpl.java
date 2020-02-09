@@ -46,6 +46,25 @@ public class AccountsManagerImpl implements AccountsManager {
     @Override
     public void closeAccount(String accountId) throws AccountDoesNotExistException, InvalidAccountIdException {
         log.trace("Going to close the account with id: \"{}\"", accountId);
+
+        checkAccountExists(accountId);
+
+        accountMap.remove(accountId);
+
+        log.trace("Account with id \"{}\" has been closed", accountId);
+    }
+
+    @Override
+    public long getBalance(String accountId) throws InvalidAccountIdException, AccountDoesNotExistException {
+        checkAccountExists(accountId);
+
+        long balance = accountMap.get(accountId).getBalance();
+
+        log.trace("Current balance of \"{}\" account in cents: {}", accountId, balance);
+        return balance;
+    }
+
+    void checkAccountExists(String accountId) throws InvalidAccountIdException, AccountDoesNotExistException {
         transferChecker.checkAccountId(accountId);
 
         if (!accountMap.containsKey(accountId)) {
@@ -53,8 +72,5 @@ public class AccountsManagerImpl implements AccountsManager {
             log.error(errorMessage);
             throw new AccountDoesNotExistException(errorMessage);
         }
-        accountMap.remove(accountId);
-
-        log.trace("Account with id \"{}\" has been closed", accountId);
     }
 }

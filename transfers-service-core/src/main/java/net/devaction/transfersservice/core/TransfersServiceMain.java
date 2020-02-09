@@ -33,6 +33,7 @@ public class TransfersServiceMain {
 
     private static final String TRANSFERS = "/transfers";
     private static final String APPLICATION_JSON = "application/json";
+    private static final String ACCOUNT_ID = "accountId";
 
     private final AccountsManager accountsManager;
     private final TransfersManager transfersManager;
@@ -98,10 +99,10 @@ public class TransfersServiceMain {
             sparkResponse.type(APPLICATION_JSON);
 
             Response response = null;
-            String accountId = sparkRequest.queryParams("accountId");
+            String accountId = sparkRequest.queryParams(ACCOUNT_ID);
+            long balance = -1L;
             try {
-                // TODO
-                // balance = accountManager.getBalance(accountID);
+                balance = accountsManager.getBalance(accountId);
             } catch (Exception ex) {
                 // In case it is a runtime exception which has not been logged yet
                 log.error("{}", ex, ex);
@@ -109,7 +110,7 @@ public class TransfersServiceMain {
                 return responseWriter.writeValueAsString(response);
             }
 
-            Balance accountBalance = new Balance(accountId, 0L);
+            Balance accountBalance = new Balance(accountId, balance);
             return responseWriter.writeValueAsString(new Response(SUCCESS, accountBalance));
         });
 
@@ -117,7 +118,7 @@ public class TransfersServiceMain {
             sparkResponse.type(APPLICATION_JSON);
 
             Response response = null;
-            String accountId = sparkRequest.queryParams("accountId");
+            String accountId = sparkRequest.queryParams(ACCOUNT_ID);
             try {
                 // TODO
                 // accountManager.getHistory(accountID);
@@ -136,9 +137,8 @@ public class TransfersServiceMain {
             sparkResponse.type(APPLICATION_JSON);
 
             Response response = null;
-            String accountId = sparkRequest.queryParams("accountId");
+            String accountId = sparkRequest.queryParams(ACCOUNT_ID);
             try {
-                // TODO
                 accountsManager.closeAccount(accountId);
             } catch (Exception ex) {
                 // In case it is a runtime exception which has not been logged yet

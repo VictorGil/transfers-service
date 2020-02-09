@@ -13,4 +13,6 @@ public interface AccountsManager {
     public String openNewAccount(String currency) throws InvalidCurrencyException;
 
     public void closeAccount(String accountId) throws AccountDoesNotExistException, InvalidAccountIdException;
+
+    public long getBalance(String accountId) throws InvalidAccountIdException, AccountDoesNotExistException;
 }
