@@ -1,5 +1,7 @@
 package net.devaction.transfersservice.core.accountsmanager;
 
+import java.util.Set;
+
 import net.devaction.transfersservice.api.entity.account.AccountInfo;
 import net.devaction.transfersservice.core.account.UnableToObtainMutexException;
 import net.devaction.transfersservice.core.transfersmanager.InvalidAccountIdException;
@@ -21,4 +23,6 @@ public interface AccountsManager {
 
     public AccountInfo getAccountInfo(String accountId) throws InvalidAccountIdException, AccountDoesNotExistException,
             UnableToObtainMutexException;
+
+    public Set<String> getAllAccountIds();
 }

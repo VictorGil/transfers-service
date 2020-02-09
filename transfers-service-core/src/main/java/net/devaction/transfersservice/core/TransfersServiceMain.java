@@ -17,6 +17,8 @@ import net.devaction.transfersservice.core.transfersmanager.TransfersManager;
 import static net.devaction.transfersservice.core.response.Status.SUCCESS;
 import static net.devaction.transfersservice.core.response.Status.ERROR;
 
+import java.util.Set;
+
 import spark.Spark;
 
 import com.google.inject.Guice;
@@ -57,6 +59,7 @@ public class TransfersServiceMain {
     private void run() {
         log.info("Starting the Transfers service");
 
+        // Example URL: http://localhost:4567/transfers/transfer
         Spark.post(TRANSFERS + "/transfer", (sparkRequest, sparkResponse) -> {
             sparkResponse.type(APPLICATION_JSON);
             String requestBody = sparkRequest.body();
@@ -77,6 +80,7 @@ public class TransfersServiceMain {
             return responseWriter.writeValueAsString(new Response(SUCCESS));
         });
 
+        // Example URL: http://localhost:4567/transfers/account?currency=GBP
         Spark.post(TRANSFERS + "/account", (sparkRequest, sparkResponse) -> {
             sparkResponse.type(APPLICATION_JSON);
 
@@ -96,6 +100,7 @@ public class TransfersServiceMain {
             return responseWriter.writeValueAsString(new Response(SUCCESS, accountBalance));
         });
 
+        // Example URL: http://localhost:4567/transfers/balance?accountId=9b6ffcbb26ab
         Spark.get(TRANSFERS + "/balance", (sparkRequest, sparkResponse) -> {
             sparkResponse.type(APPLICATION_JSON);
 
@@ -115,6 +120,7 @@ public class TransfersServiceMain {
             return responseWriter.writeValueAsString(new Response(SUCCESS, accountBalance));
         });
 
+        // Example URL: http://localhost:4567/transfers/info?accountId=0e1f2f1b5612
         Spark.get(TRANSFERS + "/info", (sparkRequest, sparkResponse) -> {
             sparkResponse.type(APPLICATION_JSON);
 
@@ -133,6 +139,25 @@ public class TransfersServiceMain {
             return responseWriter.writeValueAsString(new Response(SUCCESS, accountInfo));
         });
 
+        // Example URL: http://localhost:4567/transfers/account/id/all
+        Spark.get(TRANSFERS + "/account/id/all", (sparkRequest, sparkResponse) -> {
+            sparkResponse.type(APPLICATION_JSON);
+
+            Response response = null;
+            Set<String> allAccountIds = null;
+            try {
+                allAccountIds = accountsManager.getAllAccountIds();
+            } catch (Exception ex) {
+                // In case it is a runtime exception which has not been logged yet
+                log.error("{}", ex, ex);
+                response = new Response(ERROR, ex.toString());
+                return responseWriter.writeValueAsString(response);
+            }
+
+            return responseWriter.writeValueAsString(new Response(SUCCESS, allAccountIds));
+        });
+
+        // Example URL: http://localhost:4567/transfers/account?accountId=9b6ffcbb26ab
         Spark.delete(TRANSFERS + "/account", (sparkRequest, sparkResponse) -> {
             sparkResponse.type(APPLICATION_JSON);
 

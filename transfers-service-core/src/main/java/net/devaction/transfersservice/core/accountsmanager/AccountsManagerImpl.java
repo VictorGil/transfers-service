@@ -1,6 +1,9 @@
 package net.devaction.transfersservice.core.accountsmanager;
 
+import java.util.Collections;
 import java.util.Map;
+import java.util.Set;
+import java.util.TreeSet;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -95,6 +98,18 @@ public class AccountsManagerImpl implements AccountsManager {
         Account account = accountMap.get(accountId);
 
         return account.getAccountInfo();
+    }
+
+    @Override
+    public Set<String> getAllAccountIds() {
+        log.trace("Going to get the ids of all the accounts");
+        Set<String> accountIdsView = accountMap.keySet();
+
+        // We use "defensive copying" because we want to decouple the set from the map
+        Set<String> accountIds = Collections.unmodifiableSet(new TreeSet<>(accountIdsView));
+
+        log.trace("All account ids: {}", accountIds);
+        return accountIds;
     }
 
     void checkAccountExists(String accountId) throws InvalidAccountIdException, AccountDoesNotExistException {

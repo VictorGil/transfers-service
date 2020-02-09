@@ -1,5 +1,7 @@
 package net.devaction.transfersservice.core.response;
 
+import java.util.Set;
+
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -25,14 +27,18 @@ public class Response {
     @JsonProperty("data")
     private final JsonNode data;
 
-    // Useful when the request succeeded
     public Response(Status status, ResponseData responseData) {
         this.status = status;
         this.errorMessage = "N/A";
         data = MAPPER.valueToTree(responseData);
     }
 
-    // Useful when the request succeeded
+    public Response(Status status, Set<String> allAccountIds) {
+        this.status = status;
+        this.errorMessage = "N/A";
+        data = MAPPER.valueToTree(allAccountIds);
+    }
+
     public Response(Status status) {
         this.status = status;
         this.errorMessage = "N/A";
