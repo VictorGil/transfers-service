@@ -1,15 +1,16 @@
 package net.devaction.transfersservice.api.entity.transfer;
 
 import java.beans.ConstructorProperties;
+
 import java.time.Instant;
-import java.time.ZoneId;
-import java.time.ZonedDateTime;
-import java.time.format.DateTimeFormatter;
-import java.util.Locale;
+
 import java.util.UUID;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import net.devaction.transfersservice.api.entity.account.AccountType;
+import net.devaction.transfersservice.api.util.timestamp.TimestampFormatter;
 
 /**
  * @author Víctor Gil
@@ -19,9 +20,6 @@ import org.slf4j.LoggerFactory;
 public class Transfer {
     private static final Logger log = LoggerFactory.getLogger(Transfer.class);
 
-    private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern(
-            "EEEE dd-MMM-yyyy HH:mm:ss.SSSZ", new Locale("en"));
-
     private static final String SAME_ID_ERROR_MESSAGE =
             "Two different entities have same id value:\n{}\nvs\n{}";
 
@@ -30,8 +28,10 @@ public class Transfer {
     private final String id;
 
     private final String sourceAccountId;
+    private final AccountType sourceAccountType;
 
     private final String targetAccountId;
+    private final AccountType targetAccountType;
 
     private final long amount;
 
@@ -40,10 +40,20 @@ public class Transfer {
     // Milliseconds from UNIX epoch
     private long timestamp;
 
-    @ConstructorProperties({"source_account_id", "target_account_id", "amount", "currency"})
-    public Transfer(String sourceAccountId, String targetAccountId, long amount, String currency) {
+    @ConstructorProperties({"source_account_id", "source_account_type",
+            "target_account_id", "target_account_type", "amount", "currency"})
+    public Transfer(String sourceAccountId, AccountType sourceAccountType,
+            String targetAccountId, AccountType targetAccountType, long amount, String currency) {
+
+        checkConstructorArguments(sourceAccountId, sourceAccountType, targetAccountId,
+                targetAccountType, amount, currency);
+
         this.sourceAccountId = sourceAccountId;
+        this.sourceAccountType = sourceAccountType;
+
         this.targetAccountId = targetAccountId;
+        this.targetAccountType = targetAccountType;
+
         this.amount = amount;
         this.currency = currency;
 
@@ -56,18 +66,12 @@ public class Transfer {
         return UUID.randomUUID().toString().substring(24);
     }
 
-    private String getTimestampString(long epochMilli) {
-
-        ZonedDateTime dateTime = Instant.ofEpochMilli(epochMilli)
-                .atZone(ZoneId.systemDefault());
-
-        return epochMilli + " (" + FORMATTER.format(dateTime) + ")";
-    }
-
     @Override
     public String toString() {
-        return "Transfer [id: " + id + ", sourceAccountId: " + sourceAccountId + ", targetAccountId: " + targetAccountId
-                + ", amount (in cents): " + amount + ", currency: " + currency + ", timestamp: " + getTimestampString(timestamp) + "]";
+        return "Transfer [id: " + id + ", sourceAccountId: " + sourceAccountId + ", sourceAccountType: "
+                + sourceAccountType + ", targetAccountId: " + targetAccountId + ", targetAccountType: "
+                + targetAccountType + ", amount (in cents): " + amount + ", currency: " + currency
+                + ", timestamp: " + TimestampFormatter.getTimestampString(timestamp) + "]";
     }
 
     @Override
@@ -78,15 +82,21 @@ public class Transfer {
         // In theory just taking into account the id should be enough
         // but we use all the fields in the hashcode computation to be
         // on the safe side
-        result = prime * result + ((id == null) ? 0 : id.hashCode());
+        result = prime * result + id.hashCode();
         result = prime * result + (int) (amount ^ (amount >>> 32));
-        result = prime * result + ((currency == null) ? 0 : currency.hashCode());
-        result = prime * result + ((sourceAccountId == null) ? 0 : sourceAccountId.hashCode());
-        result = prime * result + ((targetAccountId == null) ? 0 : targetAccountId.hashCode());
+        result = prime * result + currency.hashCode();
+
+        result = prime * result + sourceAccountId.hashCode();
+        result = prime * result + sourceAccountType.hashCode();
+
+        result = prime * result + targetAccountId.hashCode();
+        result = prime * result + targetAccountType.hashCode();
+
         result = prime * result + (int) (timestamp ^ (timestamp >>> 32));
 
         return result;
     }
+
 
     @Override
     public boolean equals(Object obj) {
@@ -120,29 +130,27 @@ public class Transfer {
             return false;
         }
 
-        if (currency == null) {
-            if (other.currency != null) {
-                return false;
-            }
-        } else if (!currency.equals(other.currency)) {
+        if (!currency.equals(other.currency)) {
             log.warn(SAME_ID_ERROR_MESSAGE, other, this);
             return false;
         }
 
-        if (sourceAccountId == null) {
-            if (other.sourceAccountId != null) {
-                return false;
-            }
-        } else if (!sourceAccountId.equals(other.sourceAccountId)) {
+        if (!sourceAccountId.equals(other.sourceAccountId)) {
             log.warn(SAME_ID_ERROR_MESSAGE, other, this);
             return false;
         }
 
-        if (targetAccountId == null) {
-            if (other.targetAccountId != null) {
-                return false;
-            }
-        } else if (!targetAccountId.equals(other.targetAccountId)) {
+        if (sourceAccountType != other.getSourceAccountType()) {
+            log.warn(SAME_ID_ERROR_MESSAGE, other, this);
+            return false;
+        }
+
+        if (!targetAccountId.equals(other.targetAccountId)) {
+            log.warn(SAME_ID_ERROR_MESSAGE, other, this);
+            return false;
+        }
+
+        if (targetAccountType != other.getTargetAccountType()) {
             log.warn(SAME_ID_ERROR_MESSAGE, other, this);
             return false;
         }
@@ -155,6 +163,17 @@ public class Transfer {
         return true;
     }
 
+    void checkConstructorArguments(String sourceAccountId, AccountType sourceAccountType,
+            String targetAccountId, AccountType targetAccountType, long amount, String currency) {
+
+        if (sourceAccountId == null || sourceAccountType == null || targetAccountId == null
+                || targetAccountType == null || currency == null || amount < 1) {
+
+            String errorMessage = "One or more of the arguments provided are invalid";
+            log.error(errorMessage);
+            throw new IllegalArgumentException(errorMessage);
+        }
+    }
 
     public String getSourceAccountId() {
         return sourceAccountId;
@@ -178,5 +197,13 @@ public class Transfer {
 
     public String getId() {
         return id;
+    }
+
+    public AccountType getSourceAccountType() {
+        return sourceAccountType;
+    }
+
+    public AccountType getTargetAccountType() {
+        return targetAccountType;
     }
 }

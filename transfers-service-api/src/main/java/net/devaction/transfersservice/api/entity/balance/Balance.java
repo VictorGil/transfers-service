@@ -27,7 +27,7 @@ public class Balance implements ResponseData {
 
     @Override
     public String toString() {
-        return "Balance [accountId=" + accountId + ", amount=" + amount + "]";
+        return "Balance [accountId: " + accountId + ", amount: " + amount + "]";
     }
 
     public String getAccountId() {

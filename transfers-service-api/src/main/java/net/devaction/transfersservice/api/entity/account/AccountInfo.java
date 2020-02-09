@@ -10,6 +10,7 @@ import net.devaction.transfersservice.api.entity.ResponseData;
  * since February 2020
  */
 public class AccountInfo implements ResponseData {
+
     private final String accountId;
     private final String currency;
     private final long balance;
@@ -22,6 +23,12 @@ public class AccountInfo implements ResponseData {
         this.currency = currency;
         this.balance = balance;
         this.history = history;
+    }
+
+    @Override
+    public String toString(){
+        return "AccountInfo [accountId: " + accountId + ", currency: " + currency
+                + ", balance: " + balance + ", history: " + history + "]";
     }
 
     public String getAccountId() {

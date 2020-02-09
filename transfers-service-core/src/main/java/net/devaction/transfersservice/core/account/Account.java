@@ -25,6 +25,7 @@ import static net.devaction.transfersservice.api.entity.account.Direction.RECEIV
  * since February 2020
  */
 public class Account {
+
     private static final Logger log = LoggerFactory.getLogger(Account.class);
 
     private final String id;
@@ -222,5 +223,11 @@ public class Account {
         }
 
         return true;
+    }
+
+    @Override
+    public String toString() {
+        return "Account [id: " + id + ", currency: " + currency + ", balance: "
+                + balance + ", number of history items: " + history.size() + "]";
     }
 }

@@ -12,6 +12,7 @@ import net.devaction.transfersservice.api.entity.ResponseData;
  * since February 2020
  */
 public class Response {
+
     private static final ObjectMapper MAPPER = new ObjectMapper();
     private static final JsonNode EMPTY_JSON_NODE = MAPPER.createObjectNode();
 
