@@ -2,9 +2,6 @@ package net.devaction.transfersservice.core.accountsmanager;
 
 import org.junit.jupiter.api.Test;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import net.devaction.transfersservice.api.entity.account.AccountInfo;
 import net.devaction.transfersservice.core.account.Account;
 import net.devaction.transfersservice.core.account.UnableToObtainMutexException;
@@ -24,8 +21,6 @@ import java.util.concurrent.ConcurrentHashMap;
  * since February 2020
  */
 class AccountsManagerImplTest {
-    private static final Logger log = LoggerFactory.getLogger(AccountsManagerImplTest.class);
-
     private final AccountsManager manager = new AccountsManagerImpl(
             new ConcurrentHashMap<String, Account>(), new TransferCheckerImpl());
 
@@ -44,7 +39,8 @@ class AccountsManagerImplTest {
         try {
             manager.closeAccount(accountId);
         } catch (AccountDoesNotExistException | InvalidAccountIdException | UnableToObtainMutexException
-                    | AccountIsAlreadyBeingClosedException ex){
+                    | AccountIsAlreadyBeingClosedException ex) {
+
             fail(ex.getClass().getSimpleName() + " was thrown");
         }
     }
@@ -73,7 +69,9 @@ class AccountsManagerImplTest {
         AccountInfo info = null;
         try {
             info = manager.getAccountInfo(accountId);
-        } catch (InvalidAccountIdException | AccountDoesNotExistException | UnableToObtainMutexException ex){
+        } catch (InvalidAccountIdException | AccountDoesNotExistException
+                | UnableToObtainMutexException ex) {
+
             fail(ex.getClass().getSimpleName() + " was thrown");
         }
 
