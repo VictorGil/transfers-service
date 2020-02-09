@@ -11,7 +11,7 @@ import net.devaction.transfersservice.core.accountsmanager.AccountDoesNotExistEx
  *
  * since February 2020
  */
-public interface TransferManager {
+public interface TransfersManager {
 
     public void processTransfer(Transfer transfer) throws AccountDoesNotExistException,
             UnableToObtainMutexException, NotEnoughBalanceException, InvalidAccountIdException,

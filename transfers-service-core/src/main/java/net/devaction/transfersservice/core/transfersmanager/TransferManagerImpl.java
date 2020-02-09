@@ -18,7 +18,7 @@ import net.devaction.transfersservice.core.accountsmanager.AccountDoesNotExistEx
  *
  * since February 2020
  */
-public class TransferManagerImpl implements TransferManager {
+public class TransferManagerImpl implements TransfersManager {
     private static final Logger log = LoggerFactory.getLogger(TransferManagerImpl.class);
 
     private final TransferChecker transferChecker = new TransferChecker();
