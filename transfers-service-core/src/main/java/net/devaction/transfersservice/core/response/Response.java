@@ -24,33 +24,24 @@ public class Response {
     @JsonProperty("data")
     private final JsonNode data;
 
-    public Response(Status status, String errorMessage, ResponseData responseData) {
-        this.status = status;
-        this.errorMessage = errorMessage;
-        this.data = MAPPER.valueToTree(responseData);
-    }
-
-    public Response(Status status, String errorMessage) {
-        this.status = status;
-        this.errorMessage = errorMessage;
-        data = EMPTY_JSON_NODE;
-    }
-
+    // Useful when the request succeeded
     public Response(Status status, ResponseData responseData) {
         this.status = status;
         this.errorMessage = "N/A";
         data = MAPPER.valueToTree(responseData);
     }
 
-    public Response(ResponseData responseData) {
-        this.status = Status.SUCCESS;
+    // Useful when the request succeeded
+    public Response(Status status) {
+        this.status = status;
         this.errorMessage = "N/A";
-        data = MAPPER.valueToTree(responseData);
+        this.data = EMPTY_JSON_NODE;
     }
 
-    public Response() {
-        this.status = Status.SUCCESS;
-        this.errorMessage = "N/A";
+    // Useful when the request failed
+    public Response(Status status, String errorMessage) {
+        this.status = status;
+        this.errorMessage = errorMessage;
         data = EMPTY_JSON_NODE;
     }
 }

@@ -8,6 +8,7 @@ import org.slf4j.LoggerFactory;
 
 import net.devaction.transfersservice.api.entity.transfer.Transfer;
 import net.devaction.transfersservice.core.account.Account;
+import net.devaction.transfersservice.core.account.AmountTooBigException;
 import net.devaction.transfersservice.core.account.NotEnoughBalanceException;
 import net.devaction.transfersservice.core.account.UnableToObtainMutexException;
 
@@ -51,7 +52,8 @@ public class AccountManager {
 
     public void processTransfer(Transfer transfer) throws AccountDoesNotExistException,
                 UnableToObtainMutexException, NotEnoughBalanceException, InvalidAccountIdException,
-                InvalidCurrencyException, InvalidAmountException, InvalidTimestampException {
+                InvalidCurrencyException, InvalidAmountException, InvalidTimestampException,
+                AmountTooBigException {
 
         log.debug("New \"Transfer\" object to be processed:\n{}", transfer);
         transferChecker.checkTransfer(transfer);
@@ -70,7 +72,7 @@ public class AccountManager {
             throw new AccountDoesNotExistException(errorMessage);
         }
 
-        // First we need to grab both mutexes, one for each of the accounts involved
+        // First we need to grab both mutex objects, one for each of the accounts involved
         log.trace("Going to try to grab the mutex for the source account");
         Object sourceAccountMutex = sourceAccount.getMutex();
         Object targetAccountMutex = null;

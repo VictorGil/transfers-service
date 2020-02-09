@@ -15,6 +15,7 @@ import org.slf4j.LoggerFactory;
 import net.devaction.transfersservice.api.entity.account.AccountHistoryItem;
 import net.devaction.transfersservice.api.entity.account.Direction;
 import net.devaction.transfersservice.api.entity.transfer.Transfer;
+import net.devaction.transfersservice.core.manager.InvalidCurrencyException;
 
 import static net.devaction.transfersservice.api.entity.account.Direction.RECEIVED;
 
@@ -44,14 +45,13 @@ public class Account {
         this.currency = currency;
     }
 
-    public void add(Transfer transfer) throws NotEnoughBalanceException {
-        // This should never happen because we should have checked before
+    public void add(Transfer transfer) throws NotEnoughBalanceException, AmountTooBigException, InvalidCurrencyException {
         if (!transfer.getCurrency().equals(currency)) {
             String errorMessage = "The transfer currency does not match this "
                     + " account currency: " + transfer.getCurrency() + " vs "
                     + currency;
             log.error(errorMessage);
-            throw new IllegalArgumentException(errorMessage);
+            throw new InvalidCurrencyException(errorMessage);
         }
 
         AccountHistoryItem historyItem = createHistoryItem(transfer);
@@ -75,10 +75,16 @@ public class Account {
                 counterpartyId, transfer.getAmount(), direction, transfer.getTimestamp());
     }
 
-    long updateBalance(long balance, long amount, Direction direction) throws NotEnoughBalanceException {
+    long updateBalance(long balance, long amount, Direction direction) throws NotEnoughBalanceException, AmountTooBigException {
 
         long updatedBalance;
         if (direction == RECEIVED) {
+            // This is to prevent "long overflow"
+            if (amount > Long.MAX_VALUE - balance) {
+                String errorMessage = "The amount is too big for the current balance";
+                log.error(errorMessage);
+                throw new AmountTooBigException(errorMessage);
+            }
             updatedBalance = balance + amount;
         } else {
             updatedBalance = balance - amount;

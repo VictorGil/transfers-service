@@ -39,7 +39,7 @@ public class TransfersServiceMain {
     private void run() {
         log.info("Starting the Transfers service");
 
-        Spark.post(TRANSFERS + "/new-transfer", (sparkRequest, sparkResponse) -> {
+        Spark.post(TRANSFERS + "/transfer", (sparkRequest, sparkResponse) -> {
             sparkResponse.type(APPLICATION_JSON);
             String requestBody = sparkRequest.body();
             log.trace("Request to process a new \"Transfer\" has been received:\n{}", requestBody);
@@ -54,10 +54,10 @@ public class TransfersServiceMain {
                 return responseWriter.writeValueAsString(response);
             }
 
-            return responseWriter.writeValueAsString(new Response());
+            return responseWriter.writeValueAsString(new Response(SUCCESS));
         });
 
-        Spark.post(TRANSFERS + "/new-account", (sparkRequest, sparkResponse) -> {
+        Spark.post(TRANSFERS + "/account", (sparkRequest, sparkResponse) -> {
             sparkResponse.type(APPLICATION_JSON);
 
             Response response = null;
@@ -72,6 +72,56 @@ public class TransfersServiceMain {
 
             Balance accountBalance = new Balance(accountId);
             return responseWriter.writeValueAsString(new Response(SUCCESS, accountBalance));
+        });
+
+        Spark.get(TRANSFERS + "/balance", (sparkRequest, sparkResponse) -> {
+            sparkResponse.type(APPLICATION_JSON);
+
+            Response response = null;
+            String accountId = sparkRequest.queryParams("accountId");
+            try {
+                // TODO
+                // balance = accountManager.getBalance(accountID);
+            } catch (Exception ex) {
+                response = new Response(ERROR, ex.toString());
+                return responseWriter.writeValueAsString(response);
+            }
+
+            Balance accountBalance = new Balance(accountId, 0L);
+            return responseWriter.writeValueAsString(new Response(SUCCESS, accountBalance));
+        });
+
+        Spark.get(TRANSFERS + "/history", (sparkRequest, sparkResponse) -> {
+            sparkResponse.type(APPLICATION_JSON);
+
+            Response response = null;
+            String accountId = sparkRequest.queryParams("accountId");
+            try {
+                // TODO
+                // accountManager.getHistory(accountID);
+            } catch (Exception ex) {
+                response = new Response(ERROR, ex.toString());
+                return responseWriter.writeValueAsString(response);
+            }
+
+            Balance accountBalance = new Balance(accountId, 0L);
+            return responseWriter.writeValueAsString(new Response(SUCCESS, accountBalance));
+        });
+
+        Spark.delete(TRANSFERS + "/account", (sparkRequest, sparkResponse) -> {
+            sparkResponse.type(APPLICATION_JSON);
+
+            Response response = null;
+            String accountId = sparkRequest.queryParams("accountId");
+            try {
+                // TODO
+                accountManager.closeAccount(accountId);
+            } catch (Exception ex) {
+                response = new Response(ERROR, ex.toString());
+                return responseWriter.writeValueAsString(response);
+            }
+
+            return responseWriter.writeValueAsString(new Response(SUCCESS));
         });
     }
 }
