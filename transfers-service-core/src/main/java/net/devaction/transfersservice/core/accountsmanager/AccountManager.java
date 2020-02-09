@@ -1,4 +1,4 @@
-package net.devaction.transfersservice.core.manager.account;
+package net.devaction.transfersservice.core.accountsmanager;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;

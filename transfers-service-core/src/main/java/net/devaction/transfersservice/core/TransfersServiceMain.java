@@ -9,7 +9,7 @@ import com.fasterxml.jackson.databind.ObjectWriter;
 import net.devaction.transfersservice.api.entity.balance.Balance;
 import net.devaction.transfersservice.api.entity.transfer.Transfer;
 import net.devaction.transfersservice.api.util.json.JsonUnmarshaller;
-import net.devaction.transfersservice.core.manager.account.AccountManager;
+import net.devaction.transfersservice.core.accountsmanager.AccountManager;
 import net.devaction.transfersservice.core.manager.transfer.TransferManager;
 import net.devaction.transfersservice.core.manager.transfer.TransferManagerImpl;
 import net.devaction.transfersservice.core.response.Response;

@@ -1,4 +1,4 @@
-package net.devaction.transfersservice.core.manager.account;
+package net.devaction.transfersservice.core.accountsmanager;
 
 /**
  * @author Víctor Gil
