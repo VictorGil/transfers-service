@@ -26,7 +26,7 @@ public class AccountInfo implements ResponseData {
     }
 
     @Override
-    public String toString(){
+    public String toString() {
         return "AccountInfo [accountId: " + accountId + ", currency: " + currency
                 + ", balance: " + balance + ", history: " + history + "]";
     }

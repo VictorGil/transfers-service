@@ -1,0 +1,10 @@
+{
+    "source_account_id": "22bfc5696816",
+    "source_account_type": "INTERNAL",
+
+    "target_account_id": "6fcbdb359fcc",
+    "target_account_type": "INTERNAL",
+
+    "amount": 10,
+    "currency": "USD"
+}
