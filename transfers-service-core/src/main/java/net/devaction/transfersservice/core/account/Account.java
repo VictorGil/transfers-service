@@ -30,7 +30,11 @@ public class Account {
 
     private final String id;
     private final String currency;
-    private long balance;
+
+    // Since we use manual locking for the write/update operations
+    // we just use "volatile" to prevent "dirty reads".
+    private volatile long balance;
+
     private final List<AccountHistoryItem> history = new LinkedList<>();
 
     // This is used for concurrency, to avoid race conditions
