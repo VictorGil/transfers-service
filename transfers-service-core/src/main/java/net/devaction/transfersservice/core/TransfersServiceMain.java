@@ -28,6 +28,7 @@ import com.google.inject.Injector;
  * since February 2020
  */
 public class TransfersServiceMain {
+
     private static final Logger log = LoggerFactory.getLogger(TransfersServiceMain.class);
 
     private static final String TRANSFERS = "/transfers";
@@ -65,6 +66,8 @@ public class TransfersServiceMain {
                 transfer = transferUnmarshaller.unmarshall(requestBody);
                 transfersManager.processTransfer(transfer);
             } catch (Exception ex) {
+                // In case it is a runtime exception which has not been logged yet
+                log.error("{}", ex, ex);
                 response = new Response(ERROR, ex.toString());
                 return responseWriter.writeValueAsString(response);
             }
@@ -81,6 +84,8 @@ public class TransfersServiceMain {
             try {
                 accountId = accountsManager.openNewAccount(currency);
             } catch (Exception ex) {
+                // In case it is a runtime exception which has not been logged yet
+                log.error("{}", ex, ex);
                 response = new Response(ERROR, ex.toString());
                 return responseWriter.writeValueAsString(response);
             }
@@ -98,6 +103,8 @@ public class TransfersServiceMain {
                 // TODO
                 // balance = accountManager.getBalance(accountID);
             } catch (Exception ex) {
+                // In case it is a runtime exception which has not been logged yet
+                log.error("{}", ex, ex);
                 response = new Response(ERROR, ex.toString());
                 return responseWriter.writeValueAsString(response);
             }
@@ -115,6 +122,8 @@ public class TransfersServiceMain {
                 // TODO
                 // accountManager.getHistory(accountID);
             } catch (Exception ex) {
+                // In case it is a runtime exception which has not been logged yet
+                log.error("{}", ex, ex);
                 response = new Response(ERROR, ex.toString());
                 return responseWriter.writeValueAsString(response);
             }
@@ -132,6 +141,8 @@ public class TransfersServiceMain {
                 // TODO
                 accountsManager.closeAccount(accountId);
             } catch (Exception ex) {
+                // In case it is a runtime exception which has not been logged yet
+                log.error("{}", ex, ex);
                 response = new Response(ERROR, ex.toString());
                 return responseWriter.writeValueAsString(response);
             }

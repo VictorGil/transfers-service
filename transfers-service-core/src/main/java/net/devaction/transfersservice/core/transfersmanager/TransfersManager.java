@@ -16,5 +16,5 @@ public interface TransfersManager {
     public void processTransfer(Transfer transfer) throws AccountDoesNotExistException,
             UnableToObtainMutexException, NotEnoughBalanceException, InvalidAccountIdException,
             InvalidCurrencyException, InvalidAmountException, InvalidTimestampException,
-            AmountTooBigException;
+            AmountTooBigException, BothAccountsAreExternalException;
 }

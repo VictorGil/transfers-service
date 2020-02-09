@@ -107,7 +107,7 @@ public class Account {
         }
 
         if (transfer.getTargetAccountId().equals(id)) {
-            return transfer.getTargetAccountId();
+            return transfer.getSourceAccountId();
         }
 
         String errorMessage = "Either the source or the target account id should match "
@@ -126,7 +126,7 @@ public class Account {
         }
 
         String errorMessage = "Either the source or the target account id should match "
-                + "this account id. Transfer:\n" + transfer;
+                + "this account id \"" + id + "\". Transfer:\n" + transfer;
         log.error(errorMessage);
         throw new IllegalArgumentException(errorMessage);
     }
