@@ -1,4 +1,4 @@
-package net.devaction.transfersservice.core.manager;
+package net.devaction.transfersservice.core.transfersmanager;
 
 import org.junit.jupiter.api.Test;
 
