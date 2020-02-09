@@ -17,7 +17,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class BalanceSerializationTest {
 
     @Test
-    public void testFromJson01() throws JsonProcessingException {
+    public void testToJson() throws JsonProcessingException {
         String accountId = "test_account_id_02";
         long amount = 500;
 

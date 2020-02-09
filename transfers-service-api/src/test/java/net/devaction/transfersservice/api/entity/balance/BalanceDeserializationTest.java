@@ -16,7 +16,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class BalanceDeserializationTest {
 
     @Test
-    public void testFromJson01() throws Exception {
+    public void testFromJson() throws Exception {
         FileReader fileReader = new FileReader();
         String balanceJson = fileReader.readFileFromClasspath("balance_01.json");
 
