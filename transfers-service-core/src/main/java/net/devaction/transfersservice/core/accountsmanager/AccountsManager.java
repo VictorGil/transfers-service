@@ -1,5 +1,6 @@
 package net.devaction.transfersservice.core.accountsmanager;
 
+import net.devaction.transfersservice.core.account.UnableToObtainMutexException;
 import net.devaction.transfersservice.core.transfersmanager.InvalidAccountIdException;
 import net.devaction.transfersservice.core.transfersmanager.InvalidCurrencyException;
 
@@ -12,7 +13,8 @@ public interface AccountsManager {
 
     public String openNewAccount(String currency) throws InvalidCurrencyException;
 
-    public void closeAccount(String accountId) throws AccountDoesNotExistException, InvalidAccountIdException;
+    public void closeAccount(String accountId) throws AccountDoesNotExistException, InvalidAccountIdException,
+            UnableToObtainMutexException, AccountIsAlreadyBeingClosedException;
 
     public long getBalance(String accountId) throws InvalidAccountIdException, AccountDoesNotExistException;
 }

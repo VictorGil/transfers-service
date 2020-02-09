@@ -38,7 +38,7 @@ public class Account {
     private final List<AccountHistoryItem> history = new LinkedList<>();
 
     // This is used for concurrency, to avoid race conditions
-    private BlockingQueue<Object> mutexQueue = new LinkedBlockingQueue<>(1);
+    private BlockingQueue<AccountMutex> mutexQueue = new LinkedBlockingQueue<>(1);
     private final Random randomGenerator = new Random();
 
     public Account(String currency) {
@@ -49,7 +49,7 @@ public class Account {
         this.id = generateRandomId();
         this.currency = currency;
 
-        mutexQueue.add(new Object());
+        mutexQueue.add(AccountMutex.ACCOUNT_IS_OPEN);
     }
 
     public void add(Transfer transfer) throws NotEnoughBalanceException, AmountTooBigException, InvalidCurrencyException {
@@ -152,8 +152,8 @@ public class Account {
         return Collections.unmodifiableList(new LinkedList<>(history));
     }
 
-    public Object getMutex() throws UnableToObtainMutexException {
-        Object mutex = null;
+    public AccountMutex getMutex() throws UnableToObtainMutexException {
+        AccountMutex mutex = null;
         final int maxNumberOfAttempts = 5;
         int count = 1;
 
@@ -179,7 +179,7 @@ public class Account {
         throw new UnableToObtainMutexException(errorMessage);
     }
 
-    public void returnMutex(Object mutex) {
+    public void returnMutex(AccountMutex mutex) {
         if (!mutexQueue.offer(mutex)) {
             log.error("Unable to return the mutex to the queue");
         }

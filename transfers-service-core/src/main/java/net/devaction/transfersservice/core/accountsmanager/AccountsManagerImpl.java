@@ -8,6 +8,8 @@ import org.slf4j.LoggerFactory;
 import com.google.inject.Inject;
 
 import net.devaction.transfersservice.core.account.Account;
+import net.devaction.transfersservice.core.account.AccountMutex;
+import net.devaction.transfersservice.core.account.UnableToObtainMutexException;
 import net.devaction.transfersservice.core.transfersmanager.InvalidAccountIdException;
 import net.devaction.transfersservice.core.transfersmanager.InvalidCurrencyException;
 import net.devaction.transfersservice.core.transfersmanager.TransferChecker;
@@ -44,14 +46,31 @@ public class AccountsManagerImpl implements AccountsManager {
     }
 
     @Override
-    public void closeAccount(String accountId) throws AccountDoesNotExistException, InvalidAccountIdException {
+    public void closeAccount(String accountId) throws AccountDoesNotExistException, InvalidAccountIdException,
+            UnableToObtainMutexException, AccountIsAlreadyBeingClosedException {
+
         log.trace("Going to close the account with id: \"{}\"", accountId);
 
         checkAccountExists(accountId);
 
+        Account account = accountMap.get(accountId);
+        log.trace("Going to try to grab the mutex lock object for the account which is going to be closed, id: {}", accountId);
+        AccountMutex mutex = null;
+        mutex = account.getMutex();
+
+        if (mutex == AccountMutex.ACCOUNT_HAS_BEEN_CLOSED) {
+            account.returnMutex(AccountMutex.ACCOUNT_HAS_BEEN_CLOSED);
+            log.trace("The mutex lock object for the internal source account id \"{}\" has been released",
+                    accountId);
+            String errorMessage = "Account with id \"" + accountId + "\" is already being closed";
+            log.error(errorMessage);
+            throw new AccountIsAlreadyBeingClosedException(errorMessage);
+        }
+
         accountMap.remove(accountId);
 
-        log.trace("Account with id \"{}\" has been closed", accountId);
+        account.returnMutex(AccountMutex.ACCOUNT_HAS_BEEN_CLOSED);
+        log.trace("Account with id \"{}\" has been closed and its mutex has been released", accountId);
     }
 
     @Override
@@ -68,7 +87,7 @@ public class AccountsManagerImpl implements AccountsManager {
         transferChecker.checkAccountId(accountId);
 
         if (!accountMap.containsKey(accountId)) {
-            String errorMessage = "Failed to close account, account with id \"" + accountId + "\" does not exist";
+            String errorMessage = "Account with id \"" + accountId + "\" does not exist";
             log.error(errorMessage);
             throw new AccountDoesNotExistException(errorMessage);
         }

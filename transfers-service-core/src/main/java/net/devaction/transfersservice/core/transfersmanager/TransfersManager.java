@@ -5,6 +5,7 @@ import net.devaction.transfersservice.core.account.AmountTooBigException;
 import net.devaction.transfersservice.core.account.NotEnoughBalanceException;
 import net.devaction.transfersservice.core.account.UnableToObtainMutexException;
 import net.devaction.transfersservice.core.accountsmanager.AccountDoesNotExistException;
+import net.devaction.transfersservice.core.accountsmanager.AccountIsAlreadyBeingClosedException;
 
 /**
  * @author Víctor Gil
@@ -16,5 +17,5 @@ public interface TransfersManager {
     public void processTransfer(Transfer transfer) throws AccountDoesNotExistException,
             UnableToObtainMutexException, NotEnoughBalanceException, InvalidAccountIdException,
             InvalidCurrencyException, InvalidAmountException, InvalidTimestampException,
-            AmountTooBigException, BothAccountsAreExternalException;
+            AmountTooBigException, BothAccountsAreExternalException, AccountIsAlreadyBeingClosedException;
 }

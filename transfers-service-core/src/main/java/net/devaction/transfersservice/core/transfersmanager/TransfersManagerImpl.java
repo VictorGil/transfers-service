@@ -12,10 +12,12 @@ import static net.devaction.transfersservice.api.entity.account.AccountType.INTE
 
 import net.devaction.transfersservice.api.entity.transfer.Transfer;
 import net.devaction.transfersservice.core.account.Account;
+import net.devaction.transfersservice.core.account.AccountMutex;
 import net.devaction.transfersservice.core.account.AmountTooBigException;
 import net.devaction.transfersservice.core.account.NotEnoughBalanceException;
 import net.devaction.transfersservice.core.account.UnableToObtainMutexException;
 import net.devaction.transfersservice.core.accountsmanager.AccountDoesNotExistException;
+import net.devaction.transfersservice.core.accountsmanager.AccountIsAlreadyBeingClosedException;
 
 /**
  * @author Víctor Gil
@@ -40,7 +42,8 @@ public class TransfersManagerImpl implements TransfersManager {
     public void processTransfer(Transfer transfer)
             throws AccountDoesNotExistException, UnableToObtainMutexException, NotEnoughBalanceException,
             InvalidAccountIdException, InvalidCurrencyException, InvalidAmountException,
-            InvalidTimestampException, AmountTooBigException, BothAccountsAreExternalException {
+            InvalidTimestampException, AmountTooBigException, BothAccountsAreExternalException,
+            AccountIsAlreadyBeingClosedException {
 
         log.debug("New \"Transfer\" object to be processed:\n{}", transfer);
         transferChecker.checkTransfer(transfer);
@@ -53,15 +56,14 @@ public class TransfersManagerImpl implements TransfersManager {
         } else {
             processExternalTransfer(transfer);
         }
-
     }
 
     void processExternalTransfer(Transfer transfer) throws BothAccountsAreExternalException,
             UnableToObtainMutexException, NotEnoughBalanceException, AmountTooBigException,
-            InvalidCurrencyException {
+            InvalidCurrencyException, AccountIsAlreadyBeingClosedException {
 
         if (transfer.getSourceAccountType() == transfer.getTargetAccountType()) {
-            String errorMessage = "Failed to process thransfer, both the source account "
+            String errorMessage = "Failed to process transfer, both the source account "
                     + "and the target account are external";
             log.error(errorMessage);
             throw new BothAccountsAreExternalException(errorMessage);
@@ -74,11 +76,21 @@ public class TransfersManagerImpl implements TransfersManager {
             internalAccount = accountMap.get(transfer.getTargetAccountId());
         }
 
-        log.trace("Going to try to grab the mutex lock object for the internal account, id: {}",
+        log.trace("Going to try to grab the mutex lock object for the (internal) account, id: {}",
                 internalAccount.getId());
-        Object internalAccountMutex = internalAccount.getMutex();
+        AccountMutex internalAccountMutex = internalAccount.getMutex();
+
+        if (internalAccountMutex == AccountMutex.ACCOUNT_HAS_BEEN_CLOSED) {
+            internalAccount.returnMutex(internalAccountMutex);
+            String errorMessage = "Account with id \"" + internalAccount.getId()
+                    + "\" is already being closed. Its mutex has been released";
+            log.error(errorMessage);
+            throw new AccountIsAlreadyBeingClosedException(errorMessage);
+        }
+
         try {
             internalAccount.add(transfer);
+            log.trace("Successful exsternal transfer processing");
         } finally {
             internalAccount.returnMutex(internalAccountMutex);
             log.trace("Mutex lock object for internal account id \"{}\" has been released",
@@ -87,7 +99,8 @@ public class TransfersManagerImpl implements TransfersManager {
     }
 
     void processInternalTransfer(Transfer transfer) throws UnableToObtainMutexException,
-            NotEnoughBalanceException, AmountTooBigException, InvalidCurrencyException {
+            NotEnoughBalanceException, AmountTooBigException, InvalidCurrencyException,
+            AccountIsAlreadyBeingClosedException {
 
         Account sourceAccount = accountMap.get(transfer.getSourceAccountId());
 
@@ -96,18 +109,35 @@ public class TransfersManagerImpl implements TransfersManager {
         // First we need to grab both mutex objects, one for each of the accounts involved
         log.trace("Going to try to grab the mutex lock object for the source (internal) account: \"{}\"",
                 sourceAccount.getId());
-        Object sourceAccountMutex = sourceAccount.getMutex();
+        AccountMutex sourceAccountMutex = sourceAccount.getMutex();
 
-        Object targetAccountMutex = null;
+        if (sourceAccountMutex == AccountMutex.ACCOUNT_HAS_BEEN_CLOSED) {
+            sourceAccount.returnMutex(sourceAccountMutex);
+            String errorMessage = "Source account with id \"" + sourceAccount.getId() + "\" is already being closed"
+                    + ". Its mutex has been released";
+            log.error(errorMessage);
+            throw new AccountIsAlreadyBeingClosedException(errorMessage);
+        }
+
+        AccountMutex targetAccountMutex = null;
         log.trace("Going to try to grab the mutex lock object for the target (internal) account: \"{}\"",
                 targetAccount.getId());
         try {
             targetAccountMutex = targetAccount.getMutex();
         } catch (UnableToObtainMutexException ex) {
             sourceAccount.returnMutex(sourceAccountMutex);
-            log.trace("The mutex lock object for the internal source account id \"{}\" has been released",
+            log.trace("The mutex lock object for the (internal) source account id \"{}\" has been released",
                     sourceAccount.getId());
             throw ex;
+        }
+
+        if (targetAccountMutex == AccountMutex.ACCOUNT_HAS_BEEN_CLOSED) {
+            sourceAccount.returnMutex(sourceAccountMutex);
+            targetAccount.returnMutex(targetAccountMutex);
+            String errorMessage = "Target account with id \"" + targetAccount.getId() + "\" is already being closed"
+                    + ". Its mutex has been released and also the source account mutex";
+            log.error(errorMessage);
+            throw new AccountIsAlreadyBeingClosedException(errorMessage);
         }
 
         try {
@@ -116,7 +146,8 @@ public class TransfersManagerImpl implements TransfersManager {
         } finally {
             sourceAccount.returnMutex(sourceAccountMutex);
             targetAccount.returnMutex(targetAccountMutex);
-            log.trace("Both mutex lock objects for internal account ids \"{}\" and \"{}\" have been released",
+            log.trace("Successful internal transfer processing, both mutex "
+                    + "lock objects for internal account ids \"{}\" and \"{}\" have been released",
                     sourceAccount.getId(), targetAccount.getId());
         }
     }
