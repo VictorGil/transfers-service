@@ -6,13 +6,9 @@ import java.util.concurrent.ConcurrentHashMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import net.devaction.transfersservice.api.entity.transfer.Transfer;
 import net.devaction.transfersservice.core.account.Account;
-import net.devaction.transfersservice.core.account.AmountTooBigException;
-import net.devaction.transfersservice.core.account.NotEnoughBalanceException;
-import net.devaction.transfersservice.core.account.UnableToObtainMutexException;
-import net.devaction.transfersservice.core.manager.transfer.InvalidAccountIdException;
-import net.devaction.transfersservice.core.manager.transfer.TransferChecker;
+import net.devaction.transfersservice.core.transfersmanager.InvalidAccountIdException;
+import net.devaction.transfersservice.core.transfersmanager.TransferChecker;
 
 /**
  * @author Víctor Gil

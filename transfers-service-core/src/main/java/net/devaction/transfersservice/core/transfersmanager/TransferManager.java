@@ -1,4 +1,4 @@
-package net.devaction.transfersservice.core.manager.transfer;
+package net.devaction.transfersservice.core.transfersmanager;
 
 import net.devaction.transfersservice.api.entity.transfer.Transfer;
 import net.devaction.transfersservice.core.account.AmountTooBigException;
