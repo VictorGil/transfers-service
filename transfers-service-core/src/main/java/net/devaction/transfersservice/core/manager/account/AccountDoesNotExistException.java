@@ -1,4 +1,4 @@
-package net.devaction.transfersservice.core.manager;
+package net.devaction.transfersservice.core.manager.account;
 
 /**
  * @author Víctor Gil
@@ -8,7 +8,7 @@ package net.devaction.transfersservice.core.manager;
 public class AccountDoesNotExistException extends Exception {
     private static final long serialVersionUID = 1359729895168821228L;
 
-    AccountDoesNotExistException(String errorMessage) {
+    public AccountDoesNotExistException(String errorMessage) {
         super(errorMessage);
     }
 }

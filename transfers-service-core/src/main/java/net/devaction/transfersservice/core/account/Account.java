@@ -15,7 +15,7 @@ import org.slf4j.LoggerFactory;
 import net.devaction.transfersservice.api.entity.account.AccountHistoryItem;
 import net.devaction.transfersservice.api.entity.account.Direction;
 import net.devaction.transfersservice.api.entity.transfer.Transfer;
-import net.devaction.transfersservice.core.manager.InvalidCurrencyException;
+import net.devaction.transfersservice.core.manager.account.InvalidCurrencyException;
 
 import static net.devaction.transfersservice.api.entity.account.Direction.RECEIVED;
 

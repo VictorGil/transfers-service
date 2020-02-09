@@ -1,4 +1,4 @@
-package net.devaction.transfersservice.core.manager;
+package net.devaction.transfersservice.core.manager.transfer;
 
 import java.time.Instant;
 
@@ -6,6 +6,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import net.devaction.transfersservice.api.entity.transfer.Transfer;
+import net.devaction.transfersservice.core.manager.account.InvalidCurrencyException;
 
 /**
  * @author Víctor Gil
@@ -27,7 +28,7 @@ public class TransferChecker {
         checkTimestamp(transfer.getTimestamp());
     }
 
-    void checkAccountId(String accountId) throws InvalidAccountIdException {
+    public void checkAccountId(String accountId) throws InvalidAccountIdException {
         if (accountId == null || accountId.length() < 12 || accountId.length() > 100) {
             String errorMessage = "Invalid accountId: " + accountId;
             log.error(errorMessage);
@@ -51,7 +52,7 @@ public class TransferChecker {
         }
     }
 
-    void checkCurrency(String currency) throws InvalidCurrencyException {
+    public void checkCurrency(String currency) throws InvalidCurrencyException {
         if (currency == null || currency.length() < 3 || currency.length() > 100) {
             String errorMessage = "Invalid currency: " + currency;
             throw new InvalidCurrencyException(errorMessage);

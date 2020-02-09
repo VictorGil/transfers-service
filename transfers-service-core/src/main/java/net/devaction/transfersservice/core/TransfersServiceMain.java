@@ -9,7 +9,9 @@ import com.fasterxml.jackson.databind.ObjectWriter;
 import net.devaction.transfersservice.api.entity.balance.Balance;
 import net.devaction.transfersservice.api.entity.transfer.Transfer;
 import net.devaction.transfersservice.api.util.json.JsonUnmarshaller;
-import net.devaction.transfersservice.core.manager.AccountManager;
+import net.devaction.transfersservice.core.manager.account.AccountManager;
+import net.devaction.transfersservice.core.manager.transfer.TransferManager;
+import net.devaction.transfersservice.core.manager.transfer.TransferManagerImpl;
 import net.devaction.transfersservice.core.response.Response;
 
 import static net.devaction.transfersservice.core.response.Status.SUCCESS;
@@ -28,7 +30,9 @@ public class TransfersServiceMain {
     private static final String TRANSFERS = "/transfers";
     private static final String APPLICATION_JSON = "application/json";
 
-    private final AccountManager accountManager = new AccountManager();
+    private final AccountManager accountManager = new AccountManager(null, null);
+    private final TransferManager transferManager = new TransferManagerImpl();
+
     private final JsonUnmarshaller<Transfer> transferUnmarshaller = new JsonUnmarshaller<>(Transfer.class);
     private final ObjectWriter responseWriter = new ObjectMapper().writerFor(Response.class);
 
@@ -48,7 +52,7 @@ public class TransfersServiceMain {
             Response response = null;
             try {
                 transfer = transferUnmarshaller.unmarshall(requestBody);
-                accountManager.processTransfer(transfer);
+                transferManager.processTransfer(transfer);
             } catch (Exception ex) {
                 response = new Response(ERROR, ex.toString());
                 return responseWriter.writeValueAsString(response);
