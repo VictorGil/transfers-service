@@ -5,7 +5,6 @@ import net.devaction.transfersservice.core.account.AmountTooBigException;
 import net.devaction.transfersservice.core.account.NotEnoughBalanceException;
 import net.devaction.transfersservice.core.account.UnableToObtainMutexException;
 import net.devaction.transfersservice.core.accountsmanager.AccountDoesNotExistException;
-import net.devaction.transfersservice.core.accountsmanager.InvalidCurrencyException;
 
 /**
  * @author Víctor Gil

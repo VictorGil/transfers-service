@@ -8,6 +8,7 @@ import org.slf4j.LoggerFactory;
 
 import net.devaction.transfersservice.core.account.Account;
 import net.devaction.transfersservice.core.transfersmanager.InvalidAccountIdException;
+import net.devaction.transfersservice.core.transfersmanager.InvalidCurrencyException;
 import net.devaction.transfersservice.core.transfersmanager.TransferChecker;
 
 /**
