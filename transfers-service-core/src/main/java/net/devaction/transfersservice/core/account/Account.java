@@ -8,11 +8,14 @@ import java.util.UUID;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.locks.ReadWriteLock;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import net.devaction.transfersservice.api.entity.account.AccountHistoryItem;
+import net.devaction.transfersservice.api.entity.account.AccountInfo;
 import net.devaction.transfersservice.api.entity.account.Direction;
 import net.devaction.transfersservice.api.entity.transfer.Transfer;
 import net.devaction.transfersservice.core.transfersmanager.InvalidCurrencyException;
@@ -37,6 +40,8 @@ public class Account {
 
     private final List<AccountHistoryItem> history = new LinkedList<>();
 
+    private ReadWriteLock readWriteLock = new ReentrantReadWriteLock();
+
     // This is used for concurrency, to avoid race conditions
     private BlockingQueue<AccountMutex> mutexQueue = new LinkedBlockingQueue<>(1);
     private final Random randomGenerator = new Random();
@@ -52,10 +57,12 @@ public class Account {
         mutexQueue.add(AccountMutex.ACCOUNT_IS_OPEN);
     }
 
-    public void add(Transfer transfer) throws NotEnoughBalanceException, AmountTooBigException, InvalidCurrencyException {
+    public void add(Transfer transfer) throws NotEnoughBalanceException, AmountTooBigException,
+            InvalidCurrencyException, UnableToObtainMutexException {
+
         if (!transfer.getCurrency().equals(currency)) {
             String errorMessage = "The transfer currency does not match this "
-                    + " account currency: " + transfer.getCurrency() + " vs "
+                    + "account currency: " + transfer.getCurrency() + " vs "
                     + currency;
             log.error(errorMessage);
             throw new InvalidCurrencyException(errorMessage);
@@ -63,10 +70,40 @@ public class Account {
 
         AccountHistoryItem historyItem = createHistoryItem(transfer);
 
+        updateBalanceAndAddItemToHistory(historyItem);
+    }
+
+    /*
+     * We need to use a write lock to prevent "dirty reads".
+     * See the other method which also uses the same lock below.
+     * */
+    private void updateBalanceAndAddItemToHistory(AccountHistoryItem historyItem)
+            throws NotEnoughBalanceException, AmountTooBigException, UnableToObtainMutexException {
+
+        boolean writeLockAcquired;
+        try {
+            writeLockAcquired = readWriteLock.writeLock().tryLock(500, TimeUnit.MILLISECONDS);
+        } catch (InterruptedException ex) {
+            String errorMessage = "Failed to process transfer, unable to obtain write lock, "
+                    + "the thread got interrupted";
+            Thread.currentThread().interrupt();
+            log.error(errorMessage, ex);
+            throw new UnableToObtainMutexException(errorMessage);
+        }
+
+        if (!writeLockAcquired) {
+            String errorMessage = "Failed to process transfer, unable to obtain the write lock, "
+                    + "time out reached while waiting";
+            log.error(errorMessage);
+            throw new UnableToObtainMutexException(errorMessage);
+        }
+
         balance = updateBalance(balance, historyItem.getAmount(),
                 historyItem.getDirection());
 
         history.add(historyItem);
+
+        readWriteLock.writeLock().unlock();
     }
 
     private String generateRandomId() {
@@ -135,21 +172,36 @@ public class Account {
         throw new IllegalArgumentException(errorMessage);
     }
 
-    public String getId() {
-        return id;
-    }
+    /*
+     * We need to use a read lock to prevent "dirty reads".
+     * See the other method which also uses the same lock above.
+     * */
+    public AccountInfo getAccountInfo() throws UnableToObtainMutexException {
 
-    public String getCurrency() {
-        return currency;
-    }
+        boolean readLockAcquired;
+        try {
+            readLockAcquired = readWriteLock.readLock().tryLock(100, TimeUnit.MILLISECONDS);
+        } catch (InterruptedException ex) {
+            String errorMessage = "Failed to get the account info, unable to obtain the read lock, "
+                    + "the thread got interrupted";
+            Thread.currentThread().interrupt();
+            log.error(errorMessage, ex);
+            throw new UnableToObtainMutexException(errorMessage);
+        }
 
-    public long getBalance() {
-        return balance;
-    }
+        if (!readLockAcquired) {
+            String errorMessage = "Failed get the account info, unable to obtain the read lock, "
+                    + "time out reached while waiting";
+            log.error(errorMessage);
+            throw new UnableToObtainMutexException(errorMessage);
+        }
 
-    public List<AccountHistoryItem> getHistory() {
         // We use "defensive copying" because we want to decouple the two lists
-        return Collections.unmodifiableList(new LinkedList<>(history));
+        List<AccountHistoryItem> historyCopy = Collections.unmodifiableList(new LinkedList<>(history));
+
+        AccountInfo accountInfo = new AccountInfo(id, currency, balance, historyCopy);
+        log.trace("AccountInfo:\n{}", accountInfo);
+        return accountInfo;
     }
 
     public AccountMutex getMutex() throws UnableToObtainMutexException {
@@ -233,5 +285,17 @@ public class Account {
     public String toString() {
         return "Account [id: " + id + ", currency: " + currency + ", balance: "
                 + balance + ", number of history items: " + history.size() + "]";
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    public String getCurrency() {
+        return currency;
+    }
+
+    public long getBalance() {
+        return balance;
     }
 }

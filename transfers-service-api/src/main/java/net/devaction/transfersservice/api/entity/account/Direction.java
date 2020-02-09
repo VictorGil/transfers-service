@@ -6,6 +6,7 @@ package net.devaction.transfersservice.api.entity.account;
  * since February 2020
  */
 public enum Direction {
+
     SENT,
     RECEIVED
 }

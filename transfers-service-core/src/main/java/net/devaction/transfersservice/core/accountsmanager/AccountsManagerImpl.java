@@ -7,6 +7,7 @@ import org.slf4j.LoggerFactory;
 
 import com.google.inject.Inject;
 
+import net.devaction.transfersservice.api.entity.account.AccountInfo;
 import net.devaction.transfersservice.core.account.Account;
 import net.devaction.transfersservice.core.account.AccountMutex;
 import net.devaction.transfersservice.core.account.UnableToObtainMutexException;
@@ -27,13 +28,13 @@ public class AccountsManagerImpl implements AccountsManager {
 
     @Inject
     public AccountsManagerImpl(Map<String, Account> accountMap, TransferChecker transferChecker) {
-
         this.accountMap = accountMap;
         this.transferChecker = transferChecker;
     }
 
     @Override
     public String openNewAccount(String currency) throws InvalidCurrencyException {
+
         log.trace("Going to open a new account, currency: {}", currency);
         transferChecker.checkCurrency(currency);
 
@@ -50,7 +51,6 @@ public class AccountsManagerImpl implements AccountsManager {
             UnableToObtainMutexException, AccountIsAlreadyBeingClosedException {
 
         log.trace("Going to close the account with id: \"{}\"", accountId);
-
         checkAccountExists(accountId);
 
         Account account = accountMap.get(accountId);
@@ -75,12 +75,26 @@ public class AccountsManagerImpl implements AccountsManager {
 
     @Override
     public long getBalance(String accountId) throws InvalidAccountIdException, AccountDoesNotExistException {
+
+        log.trace("Going to get the balance of the account with id \"{}\"", accountId);
         checkAccountExists(accountId);
 
         long balance = accountMap.get(accountId).getBalance();
 
         log.trace("Current balance of \"{}\" account in cents: {}", accountId, balance);
         return balance;
+    }
+
+    @Override
+    public AccountInfo getAccountInfo(String accountId) throws InvalidAccountIdException,
+            AccountDoesNotExistException, UnableToObtainMutexException {
+
+        log.trace("Going to get the info and history of the account with id \"{}\"", accountId);
+        checkAccountExists(accountId);
+
+        Account account = accountMap.get(accountId);
+
+        return account.getAccountInfo();
     }
 
     void checkAccountExists(String accountId) throws InvalidAccountIdException, AccountDoesNotExistException {

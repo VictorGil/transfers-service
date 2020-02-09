@@ -90,7 +90,7 @@ public class TransfersManagerImpl implements TransfersManager {
 
         try {
             internalAccount.add(transfer);
-            log.trace("Successful exsternal transfer processing");
+            log.trace("Successful external transfer processing");
         } finally {
             internalAccount.returnMutex(internalAccountMutex);
             log.trace("Mutex lock object for internal account id \"{}\" has been released",

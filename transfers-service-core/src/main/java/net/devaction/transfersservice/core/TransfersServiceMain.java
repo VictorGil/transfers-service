@@ -6,6 +6,7 @@ import org.slf4j.LoggerFactory;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;
 
+import net.devaction.transfersservice.api.entity.account.AccountInfo;
 import net.devaction.transfersservice.api.entity.balance.Balance;
 import net.devaction.transfersservice.api.entity.transfer.Transfer;
 import net.devaction.transfersservice.api.util.json.JsonUnmarshaller;
@@ -114,14 +115,14 @@ public class TransfersServiceMain {
             return responseWriter.writeValueAsString(new Response(SUCCESS, accountBalance));
         });
 
-        Spark.get(TRANSFERS + "/history", (sparkRequest, sparkResponse) -> {
+        Spark.get(TRANSFERS + "/info", (sparkRequest, sparkResponse) -> {
             sparkResponse.type(APPLICATION_JSON);
 
             Response response = null;
             String accountId = sparkRequest.queryParams(ACCOUNT_ID);
+            AccountInfo accountInfo = null;
             try {
-                // TODO
-                // accountManager.getHistory(accountID);
+                accountInfo = accountsManager.getAccountInfo(accountId);
             } catch (Exception ex) {
                 // In case it is a runtime exception which has not been logged yet
                 log.error("{}", ex, ex);
@@ -129,8 +130,7 @@ public class TransfersServiceMain {
                 return responseWriter.writeValueAsString(response);
             }
 
-            Balance accountBalance = new Balance(accountId, 0L);
-            return responseWriter.writeValueAsString(new Response(SUCCESS, accountBalance));
+            return responseWriter.writeValueAsString(new Response(SUCCESS, accountInfo));
         });
 
         Spark.delete(TRANSFERS + "/account", (sparkRequest, sparkResponse) -> {
