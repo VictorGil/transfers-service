@@ -24,6 +24,10 @@ public class AccountManager {
 
     private final Map<String, Account> accountMap = new ConcurrentHashMap<>();
 
+    public AccountManager(TransferChecker transferChecker, Map<String, Account> accountMap) {
+        
+    }
+
     public String openNewAccount(String currency) throws InvalidCurrencyException {
         log.trace("Going to open a new account, currency: {}", currency);
         transferChecker.checkCurrency(currency);
