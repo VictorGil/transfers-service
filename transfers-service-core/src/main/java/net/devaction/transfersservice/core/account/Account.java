@@ -35,15 +35,20 @@ public class Account {
     private final String currency;
 
     // Since we use manual locking for the write/update operations
-    // we just use "volatile" to prevent "dirty reads".
+    // we just use "volatile" to prevent "dirty reads" when getting
+    // just the current account balance.
     private volatile long balance;
 
     private final List<AccountHistoryItem> history = new LinkedList<>();
 
+    // We use this lock to allow multiple concurrent read operations (getAccountInfo)
+    // while preventing dirty reads
     private ReadWriteLock readWriteLock = new ReentrantReadWriteLock();
 
-    // This is used for concurrency, to avoid race conditions
+    // This is used for concurrency, to avoid race conditions when we need to process
+    // two or more requests which have one or both accounts in common.
     private BlockingQueue<AccountMutex> mutexQueue = new LinkedBlockingQueue<>(1);
+
     private final Random randomGenerator = new Random();
 
     public Account(String currency) {

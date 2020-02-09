@@ -6,7 +6,7 @@ package net.devaction.transfersservice.core.transfersmanager;
  * since February 2020
  */
 public class InvalidAmountException extends Exception {
-    private static final long serialVersionUID = 1359729895168821228L;
+    private static final long serialVersionUID = 1359729895168821308L;
 
     InvalidAmountException(String errorMessage) {
         super(errorMessage);
