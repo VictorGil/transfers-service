@@ -19,8 +19,47 @@ prevents issues related to race conditions while having low performance impact.
 
 ## Implementation Details
  - An amount of money is represented by a long value and each unit of that value corresponds to a cent.  
- - Hence, the minimum amount of a any given currency that can be transfer between accounts is a cent.  
+ - Hence, the minimum amount of a any given currency that can be transferred between accounts is one cent.  
  - For the sake of simplicity, the multi-currency support is very basic: 
 the currency of the source account, the target account and the transfer must match.  
  - Two concurrent transfers do not block each other unless they refer to the same account or couple of accounts.  
-   
+
+ ## Example Request And Response Pairs
+ - Example request to create a new account:  
+ ```
+ POST http://localhost:4567/transfers/account?currency=GBP  (no request body)
+ ```
+ - Example response:  
+ ```
+ {
+    "status": "SUCCESS",
+    "error_message": "N/A",
+    "data": {
+        "amount": 0,
+        "accountId": "8a7fc0492e50"
+    }
+}
+ ```
+ - Example request to process an incoming money transfer:  
+ ```
+ POST http://localhost:4567/transfers/transfer
+ Request body:
+ {
+    "source_account_id": "157016b32e6c",
+    "source_account_type": "EXTERNAL",
+
+    "target_account_id": "8a7fc0492e50",
+    "target_account_type": "INTERNAL",
+
+    "amount": 100000,
+    "currency": "GBP"
+}
+```
+  - Example response:  
+```
+{
+    "status": "SUCCESS",
+    "error_message": "N/A",
+    "data": {}
+}
+```
