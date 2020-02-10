@@ -19,7 +19,7 @@ prevents issues related to race conditions while having low performance impact.
 
 ## Implementation Details
  - An amount of money is represented by a _long_ value and each unit of that value corresponds to a cent.  
- - Hence, the minimum amount of a any given currency that can be transferred between accounts is one cent.  
+ - Hence, the minimum amount of a any given currency that can be transferred between two accounts is one cent.  
  - For the sake of simplicity, the multi-currency support is very basic: 
 the currency of the source account, the target account and the transfer must match.  
  - Two concurrent transfers do not block each other unless they refer to the same account or couple of accounts.  
