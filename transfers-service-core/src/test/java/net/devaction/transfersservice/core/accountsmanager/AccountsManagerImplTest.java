@@ -13,6 +13,7 @@ import static org.junit.jupiter.api.Assertions.fail;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
@@ -79,5 +80,23 @@ class AccountsManagerImplTest {
         assertThat(info.getBalance()).isEqualTo(0L);
         assertThat(info.getCurrency()).isEqualTo("GBP");
         assertThat(info.getHistory()).hasSize(0);
+    }
+
+    @Test
+    public void testGetAllAccountIds() {
+
+        String accountId1 = null;
+        String accountId2 = null;
+        try {
+            accountId1 = manager.openNewAccount("EUR");
+            accountId2 = manager.openNewAccount("AUD");
+        } catch (InvalidCurrencyException ex) {
+            fail(InvalidCurrencyException.class.getSimpleName() + " was thrown");
+        }
+
+        Set<String> allAccountIds = manager.getAllAccountIds();
+
+        assertThat(allAccountIds).hasSize(2);
+        assertThat(allAccountIds).contains(accountId1, accountId2);
     }
 }
