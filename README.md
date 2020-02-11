@@ -67,13 +67,13 @@ the currency of the source account, the target account and the transfer must mat
 ## Important Test
 [TransfersManagerImplConcurrencyTest.java](https://github.com/VictorGil/transfers-service/blob/master/transfers-service-core/src/test/java/net/devaction/transfersservice/core/transfersmanager/concurrency/TransfersManagerImplConcurrencyTest.java)
 is used to test the service under a simulated very high load, using a configurable number of threads,
-a small number of accounts and a large number of concurrent transactions among those accounts.
+a small number of accounts and a large number of concurrent transactions among those accounts.  
 We can see that despite some transfers not being able to be processed, the service is always kept
 in a valid and consistent state.
 
 ## Similar Previous Project
-In the past I a created similar service but based on asynchronous messaging instead of (synchronous) REST.
+In the past I a created similar service but based on asynchronous messaging instead of (synchronous) REST.  
 More information on:
 - [dev.to](https://dev.to/victorgil/using-apache-kafka-to-implement-event-driven-microservices-af2)
-- [Source code](https://github.com/VictorGil/transfers_recording_service)
+- [source code](https://github.com/VictorGil/transfers_recording_service)
  
