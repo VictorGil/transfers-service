@@ -72,7 +72,7 @@ We can see that despite some transfers not being able to be processed, the servi
 in a valid and consistent state.
 
 ## Similar Previous Project
-In the past I created similar service but based on asynchronous messaging instead of (synchronous) REST.  
+In the past I created a similar service but based on asynchronous messaging instead of (synchronous) REST.  
 More information on:
 - [dev.to](https://dev.to/victorgil/using-apache-kafka-to-implement-event-driven-microservices-af2)
 - [source code](https://github.com/VictorGil/transfers_recording_service)
