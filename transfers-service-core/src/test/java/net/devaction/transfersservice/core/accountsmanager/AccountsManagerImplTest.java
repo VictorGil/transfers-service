@@ -4,8 +4,6 @@ import org.junit.jupiter.api.Test;
 
 import net.devaction.transfersservice.api.entity.account.AccountInfo;
 import net.devaction.transfersservice.core.account.Account;
-import net.devaction.transfersservice.core.account.UnableToObtainMutexException;
-import net.devaction.transfersservice.core.transfersmanager.InvalidAccountIdException;
 import net.devaction.transfersservice.core.transfersmanager.InvalidCurrencyException;
 import net.devaction.transfersservice.core.transfersmanager.TransferCheckerImpl;
 
@@ -33,16 +31,16 @@ class AccountsManagerImplTest {
             accountId = manager.openNewAccount("USD");
         } catch (InvalidCurrencyException ex) {
             fail(InvalidCurrencyException.class.getSimpleName() + " was thrown");
+            return;
         }
 
         assertThat(accountId).hasSize(12);
 
         try {
             manager.closeAccount(accountId);
-        } catch (AccountDoesNotExistException | InvalidAccountIdException | UnableToObtainMutexException
-                    | AccountIsAlreadyBeingClosedException ex) {
-
+        } catch (Exception ex) {
             fail(ex.getClass().getSimpleName() + " was thrown");
+            return;
         }
     }
 
@@ -53,7 +51,8 @@ class AccountsManagerImplTest {
         try {
             accountId = manager.openNewAccount("GBP");
         } catch (InvalidCurrencyException ex) {
-            fail(InvalidCurrencyException.class.getSimpleName() + " was thrown");
+            fail(ex.getClass().getSimpleName() + " was thrown");
+            return;
         }
 
         assertThat(accountId).hasSize(12);
@@ -61,8 +60,9 @@ class AccountsManagerImplTest {
         long balance = -1;
         try {
             balance = manager.getBalance(accountId);
-        } catch (InvalidAccountIdException | AccountDoesNotExistException ex) {
+        } catch (Exception ex) {
             fail(ex.getClass().getSimpleName() + " was thrown");
+            return;
         }
 
         assertThat(balance).isEqualTo(0L);
@@ -70,10 +70,9 @@ class AccountsManagerImplTest {
         AccountInfo info = null;
         try {
             info = manager.getAccountInfo(accountId);
-        } catch (InvalidAccountIdException | AccountDoesNotExistException
-                | UnableToObtainMutexException ex) {
-
+        } catch (Exception ex) {
             fail(ex.getClass().getSimpleName() + " was thrown");
+            return;
         }
 
         assertThat(info.getAccountId()).isEqualTo(accountId);
@@ -92,6 +91,7 @@ class AccountsManagerImplTest {
             accountId2 = manager.openNewAccount("AUD");
         } catch (InvalidCurrencyException ex) {
             fail(InvalidCurrencyException.class.getSimpleName() + " was thrown");
+            return;
         }
 
         Set<String> allAccountIds = manager.getAllAccountIds();

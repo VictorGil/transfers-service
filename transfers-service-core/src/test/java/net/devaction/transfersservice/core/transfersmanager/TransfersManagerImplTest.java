@@ -51,6 +51,7 @@ class TransfersManagerImplTest {
             accountId = accountsManager.openNewAccount("EUR");
         } catch (InvalidCurrencyException ex) {
             fail(InvalidCurrencyException.class.getSimpleName() + " was thrown");
+            return;
         }
 
         Transfer transfer = new Transfer("external-account-3bx1", EXTERNAL, accountId, INTERNAL,
@@ -65,6 +66,7 @@ class TransfersManagerImplTest {
                 | BothAccountsAreExternalException | AccountIsAlreadyBeingClosedException ex) {
 
             fail(ex.getClass().getSimpleName() + " was thrown");
+            return;
         }
 
         long balance = -1;
@@ -72,6 +74,7 @@ class TransfersManagerImplTest {
             balance = accountsManager.getBalance(accountId);
         } catch (InvalidAccountIdException | AccountDoesNotExistException ex) {
             fail(ex.getClass().getSimpleName() + " was thrown");
+            return;
         }
 
         assertThat(balance).isEqualTo(transfer.getAmount());
@@ -87,6 +90,7 @@ class TransfersManagerImplTest {
             accountId2 = accountsManager.openNewAccount("AUD");
         } catch (InvalidCurrencyException ex) {
             fail(InvalidCurrencyException.class.getSimpleName() + " was thrown");
+            return;
         }
 
         Transfer externalTransfer1 = new Transfer("external-account-3c2f", EXTERNAL, accountId1, INTERNAL,
@@ -106,6 +110,7 @@ class TransfersManagerImplTest {
                 | BothAccountsAreExternalException | AccountIsAlreadyBeingClosedException ex) {
 
             fail(ex.getClass().getSimpleName() + " was thrown");
+            return;
         }
 
         long balance1 = -1;
@@ -115,6 +120,7 @@ class TransfersManagerImplTest {
             balance2 = accountsManager.getBalance(accountId2);
         } catch (InvalidAccountIdException | AccountDoesNotExistException ex) {
             fail(ex.getClass().getSimpleName() + " was thrown");
+            return;
         }
 
         assertThat(balance1).isEqualTo(35000L);
