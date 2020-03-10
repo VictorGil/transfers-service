@@ -17,6 +17,7 @@ import net.devaction.transfersservice.api.util.timestamp.TimestampFormatter;
  *
  * since February 2020
  */
+// This is sent by the client as part of a request
 public class Transfer {
     private static final Logger log = LoggerFactory.getLogger(Transfer.class);
 

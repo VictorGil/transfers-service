@@ -9,6 +9,7 @@ import net.devaction.transfersservice.api.entity.ResponseData;
  *
  * since February 2020
  */
+// This is sent to the client as part of a response
 public class AccountInfo implements ResponseData {
 
     private final String accountId;
